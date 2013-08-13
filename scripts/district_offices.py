@@ -1,33 +1,25 @@
 #!/usr/bin/env python
 
-# run with --scrape:
-#   attempts to collect 
+# --scrape
+#   attempts to collect office information from congressional websites. 
+#   options: --cache, --debug, --bioguide (latter for debugging a single member)
 
-# run with --scrape (or by default):
-#   given a service, looks through current members for those missing an account on that service,
-#   and checks that member's official website's source code for mentions of that service.
-#   A CSV of "leads" is produced for manual review.
-#
-# run with --update:
-#   reads the CSV produced by --scrape back in and updates the YAML accordingly.
-#
-# run with --clean:
-#   removes legislators from the social media file who are no longer current
-#
-# run with --resolvefb:
-#   finds both Facebook usernames and graph IDs and updates the YAML accordingly.
-#
-# run with --resolveyt:
-#   finds both YouTube usernames and channel IDs and updates the YAML accordingly.
+# --geocode
+#   Geocodes retrieved offices against Google's API, caches results
 
-# other options:
-#  --service (required): "twitter", "youtube", or "facebook"
-#  --bioguide: limit to only one particular member
-#  --email:
-#      in conjunction with --scrape, send an email if there are any new leads, using
-#      settings in scripts/email/config.yml (if it was created and filled out).
+# --verify
+#   Tests geocoding results against the Sunlight Congress API to determine whether offices
+#   are located in the states/districts of the representative. Requires a SUNLIGHT_API_KEY
+#   to be specified in settings.py or local_settings.py. See http://sunlightfoundation.com/api 
+#   for more details/to obtain a free key.
 
-# uses a CSV at data/social_media_blacklist.csv to exclude known non-individual account names
+# --remove-dc
+#   Removes offices located in Washington, D.C. There are better/canonical sources for
+#   D.C. office addresses.
+
+# --review
+#   Launches interactive/curses-based address reviewing tool. Sorts addresses into 
+#   files that will require additional intervention and ones that are ready for use.
 
 import csv
 import json
@@ -44,7 +36,8 @@ from utils import download, load_data, save_data, parse_date
 import lxml.html, lxml.etree, StringIO
 import requests
 import urlparse
-import collections
+import curses
+import math
 from settings import *
 
 debug = False
@@ -101,12 +94,19 @@ def detect_possible_office_elements(member, url, body):
         # check to ensure we haven't already added this element -- use zip and phone as keys
         z_key = ''.join(possible_zipcode_matches[0]).strip()
         p_key = possible_phone_matches and re.sub(r'[^\d]','',possible_phone_matches.group(0).strip()) or ''
+        source_hash = hashlib.sha256(element_html).hexdigest()
         possible_office_matches["%s/%s" % (z_key, p_key)] = (element, {
           '_scraped': True,
           '_scraped_date': datetime.datetime.now().isoformat(),
           '_scraped_url': url,
-          '_source_hash': hashlib.sha256(element_html).hexdigest()
+          '_source_hash': source_hash
         })
+
+        # store the HTML fragment for debugging purposes
+        # store the result(s)
+        f = open('data/source/%s.html' % source_hash, 'w')
+        pickle.dump(element_html, f)
+        f.close()
 
   return possible_office_matches
 
@@ -125,6 +125,7 @@ def extract_info_from_office_elements(member, possible_office_matches):
 
     # remove other junk
     match_html = re.sub('(&nbsp;|&#160;)',' ', re.sub(r'&#13;','',match_html)).strip()
+    match_html = re.sub('&amp;', '&', match_html, flags=re.IGNORECASE)
     # remove CSS & JS
     match_html = re.sub('<script[^>]*>.*?<\/script[^>]*>', '', match_html, flags=(re.MULTILINE|re.DOTALL|re.IGNORECASE))
     match_html = re.sub('<style[^>]*>.*?<\/style[^>]*>', '', match_html, flags=(re.MULTILINE|re.DOTALL|re.IGNORECASE))
@@ -177,7 +178,7 @@ def extract_info_from_office_elements(member, possible_office_matches):
     # is there a fax number? 
     for (i,line) in enumerate(match_lines):
       m_phone = re_phone.search(line)
-      if m_phone and re.search(r'(fax:?|\(f\))', line, re.I):
+      if m_phone and re.search(r'(fax:?|\(f\)|\Wf\.)', line, re.I):
         extracted_info['fax'] = normalize_phone_number(strip_tags(m_phone.group(0)))
         match_lines.pop(i)
         break
@@ -293,6 +294,7 @@ def scrape():
       current_bioguide[m["id"]["bioguide"]] = m
 
   output = {}
+  flagged = {}
 
   # iterate through current members of congress
   for bioguide in current_bioguide.keys():
@@ -345,7 +347,7 @@ def scrape():
     # still no match? mark it as requiring review:
     if len(possible_office_matches)==0:
       if not output.has_key(bioguide):
-        output[bioguide] = {'_requires_manual_intervention': True, 'url': url}
+        flagged[bioguide] = ({'_requires_manual_intervention': True, 'url': url},)
 
     # otherwise, extract the individual fields for offices and store them
     extracted_offices = extract_info_from_office_elements(current_bioguide[bioguide]["terms"][-1], possible_office_matches)
@@ -356,6 +358,7 @@ def scrape():
   if debug_bioguide is None:
     print "Saving data..."
     save_data(output, "legislators-district-offices-unreviewed.yaml")
+    save_data(flagged, 'legislators-district-offices-flagged.yaml')
   else:
     pprint.pprint(output)
 
@@ -418,6 +421,106 @@ def verify(offices):
   save_data(offices, "legislators-district-offices-unreviewed.yaml")
 
   return offices
+
+def review_save(unreviewed, approved, flagged):
+  save_data(unreviewed, 'legislators-district-offices-unreviewed.yaml')
+  save_data(approved, 'legislators-district-offices-approved.yaml')
+  save_data(flagged, 'legislators-district-offices-flagged.yaml')
+
+def review():
+  offices = load_data('legislators-district-offices-unreviewed.yaml')
+  unreviewed = []
+  for bioguide in offices:
+    for office in offices[bioguide]:
+      unreviewed.append((bioguide, office))
+  num_to_review = len(unreviewed)
+
+  approved = {}
+  try:    
+    approved = load_data('legislators-district-offices-approved.yaml')
+  except Exception, e:
+    pass
+
+  flagged = {}
+  try:
+    flagged = load_data('legislators-district-offices-flagged.yaml')
+  except Exception, e:
+    pass
+
+  # initialize curses
+  window = curses.initscr()
+  curses.noecho()
+  curses.cbreak()
+  curses.start_color()
+  curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
+  curses.init_pair(2, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+
+  window.keypad(1)
+
+  (max_y, max_x) = window.getmaxyx()
+
+  try:
+    num_reviewed = 0
+    while len(unreviewed)>0:
+      # clear the window
+      window.erase()
+
+      # draw menu line across bottom
+      window.addstr(max_y-4, 0, "[A]pprove     [F]lag     [S]ave     s[K]ip     [Q]uit", curses.A_REVERSE)
+
+      # draw status line
+      status_width = int(math.floor(max_x * (num_reviewed / (num_to_review * 1.0))))
+      window.addstr(max_y-1, 0, (" " * status_width), curses.A_REVERSE | curses.color_pair(1))
+      window.addstr(max_y-2, 0, "%d/%d" % (num_reviewed, num_to_review), curses.color_pair(1))
+      
+      # display office under review
+      (bioguide, office) = unreviewed[0]
+      fields = ('address_0', 'address_1', 'address_2', 'address_3', 'address_4', 'city', 'state', 'zipcode', 'phone', 'fax', 'hours', 'map_link')
+      for (row, field) in enumerate(fields):
+        window.addstr(row+1, 1, "%10s:" % field, curses.color_pair(2))
+        window.addstr(row+1, 13, office.get(field, '')[:max_x-20], curses.color_pair(0))
+      if office.has_key('confirmed_in_district'):
+        window.addstr(len(fields)+2, 1, "CONFIRMED IN DISTRICT", curses.color_pair(1))
+
+      # paint window
+      window.refresh()
+
+      # grab input and file, if appropriate
+      c = chr(window.getch()).upper()
+      if c=='Q':
+        break
+      if c=='S':
+        window.addstr(max_y-2, max_x-len('Saving... '), 'Saving...', curses.color_pair(1))
+        window.refresh()
+        review_save(unreviewed, approved, flagged)
+        window.addstr(max_y-2, max_x-len('Saved.    '), 'Saved.   ', curses.color_pair(1))
+        window.refresh()        
+      if c in ('F', 'A', 'K'):
+        (bioguide, office) = unreviewed.pop(0)
+        if c=='A':
+          if not approved.has_key(bioguide):
+            approved[bioguide] = []
+          approved[bioguide].append(office)
+        if c=='F':
+          if not flagged.has_key(bioguide):
+            flagged[bioguide] = []
+          flagged[bioguide].append(office)        
+        num_reviewed = num_reviewed + 1
+
+      # autosave every 50
+      # if (num_reviewed%50)==1 and num_reviewed>1:
+        # review_save(unreviewed, approved, flagged)
+        # window.addstr(max_y-2, max_x-len('Autosaved '), 'Autosaved ', curses.color_pair(1))
+
+    
+
+
+
+  finally:
+    curses.nocbreak()
+    window.keypad(0)
+    curses.echo()
+    curses.endwin()
 
 
 def office_address_string(office):
@@ -493,6 +596,14 @@ if __name__ == '__main__':
     if offices is None:
       offices = utils.load_data("legislators-district-offices-unreviewed.yaml") # load data if necessary    
     offices = verify(offices) # test geocoded info against districts
+
+  if utils.flags().get('review', False):
+    if offices is None:
+      offices = utils.load_data('legislators-district-offices-unreviewed.yaml')
+      if len(offices)==0:
+        print 'No reviewable data found.'
+      else:
+        review()
 
 
 
