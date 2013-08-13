@@ -3,9 +3,11 @@
 # --scrape
 #   attempts to collect office information from congressional websites. 
 #   options: --cache, --debug, --bioguide (latter for debugging a single member)
+#   NOTE: expect the cached fragments to occupy a few hundred MB
 
 # --geocode
 #   Geocodes retrieved offices against Google's API, caches results
+#   Expect the cache to occupy a couple dozen MB.
 
 # --verify
 #   Tests geocoding results against the Sunlight Congress API to determine whether offices
@@ -279,6 +281,9 @@ def scrape():
   necessary and making informed guesses about where district office info
   can be found. """
 
+  # make HTML fragment caching directory
+  utils.mkdir_p('data/source')
+
   debug = utils.flags().get('debug', False)
   cache = utils.flags().get('cache', False)
   debug_bioguide = utils.flags().get('bioguide', None)
@@ -380,9 +385,7 @@ def verify(offices):
   for bioguide in offices:    
     for office in offices[bioguide]:    
 
-      # skip obviously incomplete or broken records  
-      if type(office) not in (dict, collections.OrderedDict):
-        continue
+      # skip obviously incomplete records        
       if not(office.has_key('address_0') and office.has_key('city') and office.has_key('state') and office.has_key('zipcode')):
         continue
 
@@ -480,7 +483,7 @@ def review():
         window.addstr(row+1, 1, "%10s:" % field, curses.color_pair(2))
         window.addstr(row+1, 13, office.get(field, '')[:max_x-20], curses.color_pair(0))
       if office.has_key('confirmed_in_district'):
-        window.addstr(len(fields)+2, 1, "CONFIRMED IN DISTRICT", curses.color_pair(1))
+        window.addstr(len(fields)+2, 2, "CONFIRMED IN DISTRICT", curses.color_pair(1))
 
       # paint window
       window.refresh()
@@ -512,9 +515,6 @@ def review():
         # review_save(unreviewed, approved, flagged)
         # window.addstr(max_y-2, max_x-len('Autosaved '), 'Autosaved ', curses.color_pair(1))
 
-    
-
-
 
   finally:
     curses.nocbreak()
@@ -541,6 +541,10 @@ def office_hash(office):
 def geocode(offices):
   """ Geocodes retrieved district office information, caching results 
   to pickle files. """
+
+  # make geocoded result caching directory
+  utils.mkdir_p('data/geocode')
+
   for bioguide in offices:    
     for office in offices[bioguide]:  
 
@@ -576,6 +580,16 @@ def geocode(offices):
       # give google a little break
       time.sleep(0.5)
 
+def remove_dc(offices):
+  output = {}
+  for bioguide in offices:
+    for office in offices[bioguide]:
+      if not office.get('state','').upper().replace('.', '').strip() in ('DC', 'DISTRICT OF COLUMBIA'):
+        if not output.has_key(bioguide):
+          output[bioguide] = []
+        output[bioguide].append(office)
+  save_data(output, "legislators-district-offices-unreviewed.yaml")
+  return output
 
 if __name__ == '__main__':
 
@@ -587,6 +601,12 @@ if __name__ == '__main__':
 
   if utils.flags().get('scrape', False):
     offices = scrape() # collect basic info
+
+  if utils.flags().get('remove-dc', False):
+    if offices is None:
+      offices = utils.load_data("legislators-district-offices-unreviewed.yaml") # load data if necessary
+    offices = remove_dc(offices) # remove DC offices
+
   if utils.flags().get('geocode', False):
     if offices is None:
       offices = utils.load_data("legislators-district-offices-unreviewed.yaml") # load data if necessary
