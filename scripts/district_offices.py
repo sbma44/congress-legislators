@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
-# run with --sweep (or by default):
+# run with --scrape:
+#   attempts to collect 
+
+# run with --scrape (or by default):
 #   given a service, looks through current members for those missing an account on that service,
 #   and checks that member's official website's source code for mentions of that service.
 #   A CSV of "leads" is produced for manual review.
 #
 # run with --update:
-#   reads the CSV produced by --sweep back in and updates the YAML accordingly.
+#   reads the CSV produced by --scrape back in and updates the YAML accordingly.
 #
 # run with --clean:
 #   removes legislators from the social media file who are no longer current
@@ -21,12 +24,13 @@
 #  --service (required): "twitter", "youtube", or "facebook"
 #  --bioguide: limit to only one particular member
 #  --email:
-#      in conjunction with --sweep, send an email if there are any new leads, using
+#      in conjunction with --scrape, send an email if there are any new leads, using
 #      settings in scripts/email/config.yml (if it was created and filled out).
 
 # uses a CSV at data/social_media_blacklist.csv to exclude known non-individual account names
 
 import csv
+import json
 import re
 import utils
 import os
@@ -40,6 +44,8 @@ from utils import download, load_data, save_data, parse_date
 import lxml.html, lxml.etree, StringIO
 import requests
 import urlparse
+import collections
+from settings import *
 
 debug = False
 cache = False
@@ -99,7 +105,8 @@ def detect_possible_office_elements(member, url, body):
           '_scraped': True,
           '_scraped_date': datetime.datetime.now().isoformat(),
           '_scraped_url': url,
-        })          
+          '_source_hash': hashlib.sha256(element_html).hexdigest()
+        })
 
   return possible_office_matches
 
@@ -123,8 +130,8 @@ def extract_info_from_office_elements(member, possible_office_matches):
     match_html = re.sub('<style[^>]*>.*?<\/style[^>]*>', '', match_html, flags=(re.MULTILINE|re.DOTALL|re.IGNORECASE))
     # turn a close/open div pair into a <br/> -- hacky!
     match_html = re.sub(r'<\/div>\s*<div[^>]*>', '\n', match_html, flags=(re.MULTILINE|re.IGNORECASE|re.DOTALL))
-    # convert <br/>'s into newlines
-    match_html = re.sub(r'<\s*br[^>]*>', '\n', match_html, flags=(re.MULTILINE|re.IGNORECASE|re.DOTALL))
+    # convert <br/>'s and <p>'s into newlines
+    match_html = re.sub(r'<\s*(br|p)[^>]*>', '\n', match_html, flags=(re.MULTILINE|re.IGNORECASE|re.DOTALL))
     # break into lines & strip
     match_lines = map(lambda x: x.strip(), re.split(r'\n+', match_html))
     # remove HTML-only lines
@@ -154,7 +161,20 @@ def extract_info_from_office_elements(member, possible_office_matches):
     if len(match_lines)==0:
       continue      
 
-    # is the last line a fax number? 
+    # office hours?
+    for (i, line) in enumerate(match_lines):
+      found_am = re.search(r'\d\s*a\.?m\.?\W', line, flags=re.IGNORECASE)
+      found_pm = re.search(r'\d\s*p\.?m\.?\W', line, flags=re.IGNORECASE)
+      found_hours = re.search(r'\Whours[\:\s\W]', line, flags=re.IGNORECASE)
+      clue_count = 0
+      for x in (found_am, found_pm, found_hours):
+        if x:
+          clue_count = clue_count + 1
+      if clue_count>=2:
+        extracted_info['hours'] = re.sub(r'^hours\:?\s+', '', strip_tags(match_lines.pop(i)), flags=re.IGNORECASE)
+        break
+
+    # is there a fax number? 
     for (i,line) in enumerate(match_lines):
       m_phone = re_phone.search(line)
       if m_phone and re.search(r'(fax:?|\(f\))', line, re.I):
@@ -253,7 +273,11 @@ def rewrite_link_to_absolute_url(root_url, link):
   return urlparse.urljoin(root_url, link)  
 
 
-def sweep():
+def scrape():
+  """ Scrapes congressional websites, trying multiple URLs when
+  necessary and making informed guesses about where district office info
+  can be found. """
+
   debug = utils.flags().get('debug', False)
   cache = utils.flags().get('cache', False)
   debug_bioguide = utils.flags().get('bioguide', None)
@@ -331,12 +355,9 @@ def sweep():
   # save our work
   if debug_bioguide is None:
     print "Saving data..."
-    save_data(output, "legislators-district-offices.yaml")
+    save_data(output, "legislators-district-offices-unreviewed.yaml")
   else:
     pprint.pprint(output)
-
-  return output
-
 
   # print out the number we're up to
   member_count = 0
@@ -348,8 +369,56 @@ def sweep():
         office_count = office_count + 1  
   print "Found %d offices for %d members out of %d" % (office_count, member_count, len(current_bioguide))
    
-def verify():
-  pass     
+  return output
+
+def verify(offices):
+  """ Open each geocoded office location and attempt to determine if it's 
+  in the legislator's district """
+  for bioguide in offices:    
+    for office in offices[bioguide]:    
+
+      # skip obviously incomplete or broken records  
+      if type(office) not in (dict, collections.OrderedDict):
+        continue
+      if not(office.has_key('address_0') and office.has_key('city') and office.has_key('state') and office.has_key('zipcode')):
+        continue
+
+      # skip DC offices
+      if office['state'].upper().strip() in ('DC', 'D.C.', 'DISTRICT OF COLUMBIA'):
+        continue
+
+      # check for a previously geocoded office
+      ohash = office_hash(office)
+      opath = 'data/geocode/%s.pickle' % ohash
+      geocoded_result = False
+      if os.path.exists(opath):
+        f = open(opath, 'r')
+        geocoded_result = pickle.load(f)
+        f.close()
+
+      if geocoded_result:        
+        coords = (geocoded_result[0]['geometry']['location']['lat'], geocoded_result[0]['geometry']['location']['lng'])
+        url = 'http://congress.api.sunlightfoundation.com/legislators/locate?latitude=%f&longitude=%f&apikey=%s' % (coords[0], coords[1], SUNLIGHT_API_KEY)        
+        response = requests.get(url)
+        result = json.loads(response.text)
+
+        # find every bioguide in the response
+        returned_bioguide_ids = []
+        for b in result.get('results',{}):
+          returned_bioguide_ids.append(b['bioguide_id'])
+        if bioguide in returned_bioguide_ids:
+          print "[%s] Confirmed in-district office: '%s'" % (bioguide, office_address_string(office))
+          office.update({'latitude': geocoded_result[0]['geometry']['location']['lat'], 'longitude': geocoded_result[0]['geometry']['location']['lng'], 'confirmed_in_district': True})
+        else:
+          print "[%s] District mismatch: '%s'" % (bioguide, office_address_string(office))
+      else:
+        print "[%s] Did not find geocoded result" % (bioguide)
+
+  print "Saving data..."
+  save_data(offices, "legislators-district-offices-unreviewed.yaml")
+
+  return offices
+
 
 def office_address_string(office):
   address = []
@@ -361,14 +430,14 @@ def office_address_string(office):
   address.append(office.get('zipcode', ''))
   return ' '.join(address)
 
-def office_hash(bioguide, office):
-  h = [bioguide]
-  for (k,v) in office.items():
-    if not k.startswith('_') and k!='hours': # excluding hours is a hack to keep my geocoding data current
-      h.append('%s:%s' % (k,v))
-  return hashlib.sha256('#'.join(h)).hexdigest()
-
+def office_hash(office):
+  if not office.has_key('_source_hash'):
+    raise Exception('office_hash() requires a valid office element as input (_source_hash key missing)')
+  return office['_source_hash'] # deliberately meant to throw an error if key doesn't exist
+  
 def geocode(offices):
+  """ Geocodes retrieved district office information, caching results 
+  to pickle files. """
   for bioguide in offices:    
     for office in offices[bioguide]:  
 
@@ -379,7 +448,7 @@ def geocode(offices):
         continue
 
       # skip previously geocoded offices
-      ohash = office_hash(bioguide, office)
+      ohash = office_hash(office)
       opath = 'data/geocode/%s.pickle' % ohash
       if os.path.exists(opath):
         print '[%s] Skipping previously geocoded office...' % (bioguide)
@@ -413,15 +482,17 @@ if __name__ == '__main__':
 
   offices = None
 
-  if utils.flags().get('sweep', False):
-    offices = sweep()
+  if utils.flags().get('scrape', False):
+    offices = scrape() # collect basic info
   if utils.flags().get('geocode', False):
     if offices is None:
-      offices = utils.load_data("legislators-district-offices.yaml")
-      geocode(offices)
+      offices = utils.load_data("legislators-district-offices-unreviewed.yaml") # load data if necessary
+    geocode(offices) # geocode data
 
   if utils.flags().get('verify', False):
-    verify()
+    if offices is None:
+      offices = utils.load_data("legislators-district-offices-unreviewed.yaml") # load data if necessary    
+    offices = verify(offices) # test geocoded info against districts
 
 
 
