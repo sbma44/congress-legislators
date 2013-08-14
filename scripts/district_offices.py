@@ -50,6 +50,8 @@ re_phone = re.compile(r'(?P<areacode>\(\d{3}\)|\d{3})?\s{0,20}[\.\-\s]\s{0,20}(?
 re_zipcode = re.compile(r'[^\d](\d{5}(\-\d{4})?)', (re.MULTILINE|re.DOTALL)) 
 re_office = re.compile(r'office', re.IGNORECASE)
 
+LOCKFILE = '.districtofficesavelock'
+
 def strip_tags(html):
   return re.sub(r'<\/?[^>]*>', r'', html).strip()
 
@@ -303,7 +305,6 @@ def scrape():
 
   # iterate through current members of congress
   for bioguide in current_bioguide.keys():
-
     
     url = current_bioguide[bioguide]["terms"][-1].get("url", None)
     if not url:
@@ -352,7 +353,7 @@ def scrape():
     # still no match? mark it as requiring review:
     if len(possible_office_matches)==0:
       if not output.has_key(bioguide):
-        flagged[bioguide] = ({'_requires_manual_intervention': True, 'url': url},)
+        flagged[bioguide] = [{'_requires_manual_intervention': True, 'url': url}]
 
     # otherwise, extract the individual fields for offices and store them
     extracted_offices = extract_info_from_office_elements(current_bioguide[bioguide]["terms"][-1], possible_office_matches)
@@ -425,30 +426,88 @@ def verify(offices):
 
   return offices
 
+def save_locked():
+  return os.path.exists(LOCKFILE)
+
+def review_prep_data_pre_save(office_list):
+  output = {}
+  for (bioguide, office) in office_list:
+    if not output.has_key(bioguide):
+      output[bioguide] = []
+    output[bioguide].append(office)
+  return output
+
+def review_prep_data_post_load(data):
+  output = []
+  for bioguide in data:
+    for office in data[bioguide]:
+      output.append((bioguide, office))
+  return output
+
 def review_save(unreviewed, approved, flagged):
-  save_data(unreviewed, 'legislators-district-offices-unreviewed.yaml')
-  save_data(approved, 'legislators-district-offices-approved.yaml')
-  save_data(flagged, 'legislators-district-offices-flagged.yaml')
+  if save_locked():
+    return
+  else:
+    if os.fork()==0: # save this in a fork
+      
+      # create lockfile
+      f = open(LOCKFILE, 'w')
+      f.close()
 
-def review():
-  offices = load_data('legislators-district-offices-unreviewed.yaml')
-  unreviewed = []
-  for bioguide in offices:
-    for office in offices[bioguide]:
-      unreviewed.append((bioguide, office))
-  num_to_review = len(unreviewed)
+      # reorganize data
+      unreviewed_s = review_prep_data_pre_save(unreviewed)
+      approved_s = review_prep_data_pre_save(approved)
+      flagged_s = review_prep_data_pre_save(flagged)
 
-  approved = {}
-  try:    
+      save_data(unreviewed_s, 'legislators-district-offices-unreviewed.yaml')
+      save_data(approved_s, 'legislators-district-offices-approved.yaml')
+      save_data(flagged_s, 'legislators-district-offices-flagged.yaml')
+
+      # remove lock
+      os.unlink(LOCKFILE)
+
+      exit(0)
+
+def review_draw_office(window, office):  
+  (max_y, max_x) = window.getmaxyx()
+
+  # display office under review
+  FIELDS = ('label', 'address_0', 'address_1', 'address_2', 'address_3', 'address_4', 'city', 'state', 'zipcode', 'phone', 'fax', 'hours', 'map_link')
+  for (row, field) in enumerate(FIELDS):
+    window.addstr(row+2, 1, "%10s:" % field, curses.color_pair(2))
+    window.addstr(row+2, 13, office.get(field, '')[:max_x-20], curses.color_pair(0))
+  if office.has_key('confirmed_in_district'):
+    window.addstr(len(FIELDS)+3, 2, "CONFIRMED IN DISTRICT", curses.color_pair(1))
+  window.refresh()
+
+def review():  
+
+  legislators = {}
+  for l in utils.load_data('legislators-current.yaml'):
+    legislators[l['id']['bioguide']] = "%s %s" % (l['name']['first'], l['name']['last'])
+
+  unreviewed = approved = flagged = {}
+  try:
+    unreviewed = load_data('legislators-district-offices-unreviewed.yaml')
+  except Exception, e:
+    pass
+  try:
     approved = load_data('legislators-district-offices-approved.yaml')
   except Exception, e:
     pass
-
-  flagged = {}
   try:
     flagged = load_data('legislators-district-offices-flagged.yaml')
   except Exception, e:
     pass
+  
+  # reorganize data into lists -- easier to manipulate
+  unreviewed = review_prep_data_post_load(unreviewed)
+  approved = review_prep_data_post_load(approved)
+  flagged = review_prep_data_post_load(flagged)
+
+  unreviewed.sort(key=lambda x: x[0]) # sort by members
+
+  num_to_review = len(unreviewed)
 
   # initialize curses
   window = curses.initscr()
@@ -457,70 +516,102 @@ def review():
   curses.start_color()
   curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK)
   curses.init_pair(2, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
-
+  curses.init_pair(3, curses.COLOR_CYAN, curses.COLOR_BLACK)
   window.keypad(1)
+  window.nodelay(1)
 
   (max_y, max_x) = window.getmaxyx()
 
+  quit_signal_received = False
+
   try:
     num_reviewed = 0
-    while len(unreviewed)>0:
+    while len(unreviewed)>0 and quit_signal_received is False:
       # clear the window
       window.erase()
 
       # draw menu line across bottom
-      window.addstr(max_y-4, 0, "[A]pprove     [F]lag     [S]ave     s[K]ip     [Q]uit", curses.A_REVERSE)
+      window.addstr(max_y-4, 0, "s[P]lit address     [M]ove address_0 into label      ", curses.A_REVERSE)
+      window.addstr(max_y-5, 0, "[A]pprove     [F]lag     [S]ave     s[K]ip     [Q]uit", curses.A_REVERSE)
 
       # draw status line
       status_width = int(math.floor(max_x * (num_reviewed / (num_to_review * 1.0))))
       window.addstr(max_y-1, 0, (" " * status_width), curses.A_REVERSE | curses.color_pair(1))
       window.addstr(max_y-2, 0, "%d/%d" % (num_reviewed, num_to_review), curses.color_pair(1))
       
-      # display office under review
       (bioguide, office) = unreviewed[0]
-      fields = ('address_0', 'address_1', 'address_2', 'address_3', 'address_4', 'city', 'state', 'zipcode', 'phone', 'fax', 'hours', 'map_link')
-      for (row, field) in enumerate(fields):
-        window.addstr(row+1, 1, "%10s:" % field, curses.color_pair(2))
-        window.addstr(row+1, 13, office.get(field, '')[:max_x-20], curses.color_pair(0))
-      if office.has_key('confirmed_in_district'):
-        window.addstr(len(fields)+2, 2, "CONFIRMED IN DISTRICT", curses.color_pair(1))
 
-      # paint window
-      window.refresh()
+      # draw legislator name
+      window.addstr(0,3," %s  %s" % (bioguide, legislators[bioguide]), curses.color_pair(0)|curses.A_BOLD)
+      window.addstr(0,3,"[", curses.color_pair(3))
+      window.addstr(0,3 + len(bioguide),"]", curses.color_pair(3))
+
+      review_draw_office(window, office)
 
       # grab input and file, if appropriate
-      c = chr(window.getch()).upper()
-      if c=='Q':
-        break
-      if c=='S':
-        window.addstr(max_y-2, max_x-len('Saving... '), 'Saving...', curses.color_pair(1))
-        window.refresh()
-        review_save(unreviewed, approved, flagged)
-        window.addstr(max_y-2, max_x-len('Saved.    '), 'Saved.   ', curses.color_pair(1))
-        window.refresh()        
-      if c in ('F', 'A', 'K'):
-        (bioguide, office) = unreviewed.pop(0)
-        if c=='A':
-          if not approved.has_key(bioguide):
-            approved[bioguide] = []
-          approved[bioguide].append(office)
-        if c=='F':
-          if not flagged.has_key(bioguide):
-            flagged[bioguide] = []
-          flagged[bioguide].append(office)        
-        num_reviewed = num_reviewed + 1
+      ch = -1
+      ch_count = 0
+      while (ch<0) and quit_signal_received is False:
+        ch = window.getch()
+        if ch_count==0: # no need to hammer the filesystem
+          if save_locked():
+            window.addstr(max_y-2, max_x-len('Saving... '), 'Saving...', curses.color_pair(1))
+            window.refresh()
+          else:
+            window.addstr(max_y-2, max_x-len('          '), '          ', curses.color_pair(1))
+            window.refresh()
+        ch_count = (ch_count + 1) % 500
 
-      # autosave every 50
-      # if (num_reviewed%50)==1 and num_reviewed>1:
-        # review_save(unreviewed, approved, flagged)
-        # window.addstr(max_y-2, max_x-len('Autosaved '), 'Autosaved ', curses.color_pair(1))
+      if ch<256:
+        c = chr(ch).upper()
+        
+        # quit/cleanup
+        if c=='Q':
+          quit_signal_received = True
+          curses.nocbreak()
+          window.keypad(0)
+          curses.echo()
+          curses.endwin()
 
+        # save
+        if c=='S':
+          review_save(unreviewed, approved, flagged)          
+        
+        # split address
+        if c=='P':
+          office['state'] = re.sub(r',$', '', office.get('city','').split(' ')[-1].strip())
+          office['city'] = re.sub(r',$', '', ' '.join(office.get('city', '').split(' ')[:-1]).strip())
+          review_draw_office(window, office)
+
+        # move address lines up one into label position
+        if c=='M': 
+          if office.has_key('address_0'):            
+            office['label'] = office['address_0']
+          else:
+            del office['label']
+          i = 0
+          while office.has_key('address_%d' % (i+1)):
+            office['address_%d' % i] = office['address_%d' % (i+1)]
+            i = i + 1
+          if office.has_key('address_%d' % i):
+            del office['address_%d' % i]
+          review_draw_office(window, office)
+
+        # file away entry -- skip, accept, flag
+        if c in ('F', 'A', 'K'):
+          unreviewed.pop(0)
+          if c=='A':
+            approved.append((bioguide, office))
+          if c=='F':
+            flagged.append((bioguide, office))          
+          num_reviewed = num_reviewed + 1
 
   finally:
     curses.nocbreak()
     window.keypad(0)
     curses.echo()
     curses.endwin()
+
 
 
 def office_address_string(office):
@@ -582,16 +673,25 @@ def geocode(offices):
 
 def remove_dc(offices):
   output = {}
+  removal_count = 0
   for bioguide in offices:
     for office in offices[bioguide]:
       if not office.get('state','').upper().replace('.', '').strip() in ('DC', 'DISTRICT OF COLUMBIA'):
         if not output.has_key(bioguide):
           output[bioguide] = []
         output[bioguide].append(office)
+    else:
+      removal_count = removal_count + 1
+  
+  print "Removed %d D.C. offices." % removal_count
+  print "Saving..."
   save_data(output, "legislators-district-offices-unreviewed.yaml")
   return output
 
 if __name__ == '__main__':
+
+  if save_locked():
+    os.unlink(LOCKFILE)  
 
   debug = utils.flags().get('debug', False)
   cache = utils.flags().get('cache', False)
