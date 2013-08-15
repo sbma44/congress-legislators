@@ -40,6 +40,7 @@ import requests
 import urlparse
 import curses
 import math
+import microtron
 from settings import *
 
 debug = False
@@ -71,12 +72,29 @@ def detect_possible_office_elements(member, url, body):
 
   possible_office_matches = {}
 
-  # collect every element in the DOM that has a ZIP, phone number and the legislator's state
+  # look for hCards
+  formats = lxml.etree.parse('microformats.xml')
+  microformat_parser = microtron.Parser(root, formats)
+  mf_results = microformat_parser.parse_format('vcard')  
+  if len(mf_results)==0:
+    mf_results = microformat_parser.parse_format('adr') # fall back to less impressive option    
+  for r in mf_results:
+    source_hash = hashlib.sha256(str(r)).hexdigest()
+    possible_office_matches[source_hash] = (r, {
+          '_scraped': True,
+          '_scraped_date': datetime.datetime.now().isoformat(),
+          '_scraped_url': url,
+          '_source_hash': source_hash,
+          '_microformat_result': True
+        })
+  if len(possible_office_matches)>0:
+    return possible_office_matches
+
+  # examine every element in the DOM for address-y-ness
   for element in root.iter(tag=lxml.etree.Element):
     element_text = None
     element_html = None
     try:
-      # element_text = lxml.etree.tostring(element, method='text').encode('utf-8')
       element_html = lxml.etree.tostring(element)
       element_text = strip_tags(element_html)
     except:
@@ -92,7 +110,6 @@ def detect_possible_office_elements(member, url, body):
       for i in ((possible_office_match is not None), (len(possible_zipcode_matches)==1), (possible_phone_matches is not None), (state_present is not None)):
         if i:          
           clue_count = clue_count + 1
-    
 
       if clue_count>=3: # if we find 3/4 matching criteria, we run with it
         # check to ensure we haven't already added this element -- use zip and phone as keys
@@ -103,7 +120,8 @@ def detect_possible_office_elements(member, url, body):
           '_scraped': True,
           '_scraped_date': datetime.datetime.now().isoformat(),
           '_scraped_url': url,
-          '_source_hash': source_hash
+          '_source_hash': source_hash,
+          '_microformat_result': False
         })
 
         # store the HTML fragment for debugging purposes
@@ -115,6 +133,139 @@ def detect_possible_office_elements(member, url, body):
   return possible_office_matches
 
 
+def extract_info_from_html_element(state, element, meta):
+
+  extracted_info = {}      
+           
+  match_html = lxml.etree.tostring(element)
+
+  # remove other junk
+  match_html = re.sub('(&nbsp;|&#160;)',' ', re.sub(r'&#13;','',match_html)).strip()
+  match_html = re.sub('&amp;', '&', match_html, flags=re.IGNORECASE)
+  # remove CSS & JS
+  match_html = re.sub('<script[^>]*>.*?<\/script[^>]*>', '', match_html, flags=(re.MULTILINE|re.DOTALL|re.IGNORECASE))
+  match_html = re.sub('<style[^>]*>.*?<\/style[^>]*>', '', match_html, flags=(re.MULTILINE|re.DOTALL|re.IGNORECASE))
+  # turn a close/open div pair into a <br/> -- hacky!
+  match_html = re.sub(r'<\/div>\s*<div[^>]*>', '\n', match_html, flags=(re.MULTILINE|re.IGNORECASE|re.DOTALL))
+  # convert <br/>'s and <p>'s into newlines
+  match_html = re.sub(r'<\s*(br|p)[^>]*>', '\n', match_html, flags=(re.MULTILINE|re.IGNORECASE|re.DOTALL))
+  # break into lines & strip
+  match_lines = map(lambda x: x.strip(), re.split(r'\n+', match_html))
+  # remove HTML-only lines
+  for (i,line) in enumerate(match_lines):
+    if len(strip_tags(line))==0:
+      match_lines.pop(i)
+
+  # now start to pick apart the address lines, beginning at the edges...
+  
+  # first: sanity check
+  if len(match_lines)==0:
+    return None
+
+  # is the first line a label?
+  if re.search(r'(<h\d|<strong|office:?)', match_lines[0], flags=re.I):
+    extracted_info['label'] = re.sub(r'\:\s*$','',strip_tags(match_lines.pop(0)))
+
+  # is there a map link?
+  for (i, line) in enumerate(match_lines):
+    map_match = re.search(r'["\'\(](http\:\/\/maps\.google\.com[^"\'\)]*)["\'\)]', line)
+    if map_match:
+      extracted_info['map_link'] = map_match.group(1)
+      match_lines.pop(i)
+      break      
+
+  # office hours?
+  for (i, line) in enumerate(match_lines):
+    found_am = re.search(r'\d\s*a\.?m\.?\W', line, flags=re.IGNORECASE)
+    found_pm = re.search(r'\d\s*p\.?m\.?\W', line, flags=re.IGNORECASE)
+    found_hours = re.search(r'\Whours[\:\s\W]', line, flags=re.IGNORECASE)
+    clue_count = 0
+    for x in (found_am, found_pm, found_hours):
+      if x:
+        clue_count = clue_count + 1
+    if clue_count>=2:
+      extracted_info['hours'] = re.sub(r'^hours\:?\s+', '', strip_tags(match_lines.pop(i)), flags=re.IGNORECASE)
+      break
+
+  # is there a fax number? 
+  for (i,line) in enumerate(match_lines):
+    m_phone = re_phone.search(line)
+    if m_phone and re.search(r'(fax:?|\(f\)|\Wf\.)', line, re.I):
+      extracted_info['fax'] = normalize_phone_number(strip_tags(m_phone.group(0)))
+      match_lines.pop(i)
+      break
+  
+  # how about just a phone number?
+  for (i,line) in enumerate(match_lines):
+    m_phone = re_phone.search(line)
+    if m_phone:
+      extracted_info['phone'] = normalize_phone_number(strip_tags(m_phone.group(0)))
+      match_lines.pop(i)
+      break
+  
+  # walk the remaining lines in reverse order. once we find a zip, start
+  # assembling the address
+  address_lines = []
+  found_zip = False
+  re_state = re.compile(r',\s*(?P<state>%s|%s|D\.?C\.?|District\s+of\s+Columbia)' % (utils.states[state.upper()], state), flags=re.IGNORECASE)
+  for i in range(len(match_lines)-1, -1, -1):
+    zipcode_match = re_zipcode.search(strip_tags(match_lines[i]))
+    if zipcode_match:
+      found_zip = True  
+      # extract city, state, zip
+      extracted_info['zipcode'] = re.sub(r'[^\d\-]','',zipcode_match.group(0).strip())
+      state_match = re_state.search(strip_tags(match_lines[i].replace(extracted_info['zipcode'],'')))
+      if state_match:
+        extracted_info['state'] = state_match.group('state')
+      extracted_info['city'] = re_state.sub('', strip_tags(match_lines[i].replace(extracted_info['zipcode'],'')))
+    elif found_zip:
+      if len(strip_tags(match_lines[i]))>0:
+        address_lines.insert(0, match_lines[i])                
+
+  # wait a minute. how many address lines did we find? if it's more than 5, chuck it out -- we're
+  # almost certainly capturing incidental HTML
+  if len(address_lines)>=5:
+    return None
+
+  # do we have address_lines[0] (non-numeric) and address_lines[1] (numeric) and no label? if so...
+  if len(address_lines)>1:
+    if re.search(r'^[^\d]', strip_tags(address_lines[0])) and re.search(r'^\d', strip_tags(address_lines[1])) and (len(extracted_info.get('label',''))==0):
+      extracted_info['label'] = strip_tags(address_lines.pop(0))
+
+  # convert our array of address elements into named fields
+  for (i,al) in enumerate(address_lines):
+    extracted_info['address_%d' % i] = strip_tags(al)
+
+  # add back in the scraping metadata
+  extracted_info.update(meta)
+  
+  return extracted_info
+
+
+def extract_info_from_microformat_result(element, meta):
+  extracted_info = {}
+  adr = element
+  if element.get('__type__')=='vcard':
+    extracted_info['label'] = "\n".join(element.get('org', ''))
+    if len(element.get('tel', []))>0:
+      for t in element.get('tel'):
+        if type(t) is dict:
+          t_type = ' '.join(t.get('type')).upper()
+          if 'FAX' in t_type:
+            extracted_info['fax'] = t.get('value', '')
+          if 'PHONE' in t_type:
+            extracted_info['phone'] = t.get('value', '')
+    else:
+      extracted_info['phone'] = "\n".join(element.get('tel', []))
+    adr = element.get('adr', [{}])[0]
+  extracted_info['city'] = adr.get('locality', '')
+  extracted_info['state'] = adr.get('region', '')
+  extracted_info['zipcode'] = adr.get('postal-code', '')
+  for (i, a) in enumerate(adr.get('street-address', [])):
+    extracted_info['address_%d' % i] = a
+
+  return extracted_info
+
 def extract_info_from_office_elements(member, possible_office_matches):
   state = member.get('state', 'XX')  
 
@@ -123,121 +274,15 @@ def extract_info_from_office_elements(member, possible_office_matches):
   # process each (hopefully!) distinct match
   for (key, (element, meta)) in possible_office_matches.items():  
 
-    extracted_info = {}      
-           
-    match_html = lxml.etree.tostring(element)
-
-    # remove other junk
-    match_html = re.sub('(&nbsp;|&#160;)',' ', re.sub(r'&#13;','',match_html)).strip()
-    match_html = re.sub('&amp;', '&', match_html, flags=re.IGNORECASE)
-    # remove CSS & JS
-    match_html = re.sub('<script[^>]*>.*?<\/script[^>]*>', '', match_html, flags=(re.MULTILINE|re.DOTALL|re.IGNORECASE))
-    match_html = re.sub('<style[^>]*>.*?<\/style[^>]*>', '', match_html, flags=(re.MULTILINE|re.DOTALL|re.IGNORECASE))
-    # turn a close/open div pair into a <br/> -- hacky!
-    match_html = re.sub(r'<\/div>\s*<div[^>]*>', '\n', match_html, flags=(re.MULTILINE|re.IGNORECASE|re.DOTALL))
-    # convert <br/>'s and <p>'s into newlines
-    match_html = re.sub(r'<\s*(br|p)[^>]*>', '\n', match_html, flags=(re.MULTILINE|re.IGNORECASE|re.DOTALL))
-    # break into lines & strip
-    match_lines = map(lambda x: x.strip(), re.split(r'\n+', match_html))
-    # remove HTML-only lines
-    for (i,line) in enumerate(match_lines):
-      if len(strip_tags(line))==0:
-        match_lines.pop(i)
-
-    # now start to pick apart the address lines, beginning at the edges...
+    extracted_info = {}
+    if meta.get('_microformat_result', False):
+      extracted_info = extract_info_from_microformat_result(element, meta)
+    else:
+      extracted_info = extract_info_from_html_element(state, element, meta)
     
-    # first: sanity check
-    if len(match_lines)==0:
-      continue
-
-    # is the first line a label?
-    if re.search(r'(<h\d|<strong|office:?)', match_lines[0], flags=re.I):
-      extracted_info['label'] = re.sub(r'\:\s*$','',strip_tags(match_lines.pop(0)))
-      if len(match_lines)==0:
-        continue
-
-    # is there a map link?
-    for (i, line) in enumerate(match_lines):
-      map_match = re.search(r'["\'\(](http\:\/\/maps\.google\.com[^"\'\)]*)["\'\)]', line)
-      if map_match:
-        extracted_info['map_link'] = map_match.group(1)
-        match_lines.pop(i)
-        break      
-    if len(match_lines)==0:
-      continue      
-
-    # office hours?
-    for (i, line) in enumerate(match_lines):
-      found_am = re.search(r'\d\s*a\.?m\.?\W', line, flags=re.IGNORECASE)
-      found_pm = re.search(r'\d\s*p\.?m\.?\W', line, flags=re.IGNORECASE)
-      found_hours = re.search(r'\Whours[\:\s\W]', line, flags=re.IGNORECASE)
-      clue_count = 0
-      for x in (found_am, found_pm, found_hours):
-        if x:
-          clue_count = clue_count + 1
-      if clue_count>=2:
-        extracted_info['hours'] = re.sub(r'^hours\:?\s+', '', strip_tags(match_lines.pop(i)), flags=re.IGNORECASE)
-        break
-
-    # is there a fax number? 
-    for (i,line) in enumerate(match_lines):
-      m_phone = re_phone.search(line)
-      if m_phone and re.search(r'(fax:?|\(f\)|\Wf\.)', line, re.I):
-        extracted_info['fax'] = normalize_phone_number(strip_tags(m_phone.group(0)))
-        match_lines.pop(i)
-        break
-    if len(match_lines)==0:
-      continue
-    
-    # how about just a phone number?
-    for (i,line) in enumerate(match_lines):
-      m_phone = re_phone.search(line)
-      if m_phone:
-        extracted_info['phone'] = normalize_phone_number(strip_tags(m_phone.group(0)))
-        match_lines.pop(i)
-        break
-    if len(match_lines)==0:
-      continue
-    
-    # walk the remaining lines in reverse order. once we find a zip, start
-    # assembling the address
-    address_lines = []
-    found_zip = False
-    re_state = re.compile(r',\s*(?P<state>%s|%s|D\.?C\.?|District\s+of\s+Columbia)' % (utils.states[state.upper()], state), flags=re.IGNORECASE)
-    for i in range(len(match_lines)-1, -1, -1):
-      zipcode_match = re_zipcode.search(strip_tags(match_lines[i]))
-      if zipcode_match:
-        found_zip = True  
-        # extract city, state, zip
-        extracted_info['zipcode'] = re.sub(r'[^\d\-]','',zipcode_match.group(0).strip())
-        state_match = re_state.search(strip_tags(match_lines[i].replace(extracted_info['zipcode'],'')))
-        if state_match:
-          extracted_info['state'] = state_match.group('state')
-        extracted_info['city'] = re_state.sub('', strip_tags(match_lines[i].replace(extracted_info['zipcode'],'')))
-      elif found_zip:
-        if len(strip_tags(match_lines[i]))>0:
-          address_lines.insert(0, match_lines[i])                
-
-
-    # wait a minute. how many address lines did we find? if it's more than 5, chuck it out -- we're
-    # almost certainly capturing incidental HTML
-    if len(address_lines)>=5:
-      continue
-
-    # do we have address_lines[0] (non-numeric) and address_lines[1] (numeric) and no label? if so...
-    if len(address_lines)>1:
-      if re.search(r'^[^\d]', strip_tags(address_lines[0])) and re.search(r'^\d', strip_tags(address_lines[1])) and (len(extracted_info.get('label',''))==0):
-        extracted_info['label'] = strip_tags(address_lines.pop(0))
-
-    # convert our array of address elements into named fields
-    for (i,al) in enumerate(address_lines):
-      extracted_info['address_%d' % i] = strip_tags(al)
-
-    # add back in the scraping metadata
-    extracted_info.update(meta)
-
     # append the record to our output set
-    extracted_offices.append(extracted_info.copy())
+    if extracted_info is not None:
+      extracted_offices.append(extracted_info.copy())
 
 
   # DEDUPLICATION (occasional artifact of lxml tree traversal)
