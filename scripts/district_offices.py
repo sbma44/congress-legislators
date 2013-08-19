@@ -80,7 +80,7 @@ def detect_possible_office_elements(member, url, body):
     mf_results = microformat_parser.parse_format('adr') # fall back to less impressive option    
   for r in mf_results:
     source_hash = hashlib.sha256(str(r)).hexdigest()
-    possible_office_matches[source_hash] = (r, {
+    possible_office_matches[source_hash] = (r.copy(), {
           '_scraped': True,
           '_scraped_date': datetime.datetime.now().isoformat(),
           '_scraped_url': url,
@@ -264,6 +264,8 @@ def extract_info_from_microformat_result(element, meta):
   for (i, a) in enumerate(adr.get('street-address', [])):
     extracted_info['address_%d' % i] = a
 
+  extracted_info.update(meta)
+
   return extracted_info
 
 def extract_info_from_office_elements(member, possible_office_matches):
@@ -368,7 +370,7 @@ def scrape():
     # check the front page for district office addresses
     possible_office_matches = {}
     possible_office_matches.update( detect_possible_office_elements(current_bioguide[bioguide]["terms"][-1], url, body) )
-    
+
     # no match? walk the links on the page looking for "district office", then "contact"    
     if len(possible_office_matches)==0:
       re_subpage_detectors = (re.compile(r'district\s+office', re.IGNORECASE|re.MULTILINE|re.DOTALL), re.compile(r'contact', re.IGNORECASE|re.MULTILINE|re.DOTALL))  
