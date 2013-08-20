@@ -495,25 +495,22 @@ def review_save(unreviewed, approved, flagged):
   if save_locked():
     return
   else:
-    if os.fork()==0: # save this in a fork
-      
-      # create lockfile
-      f = open(LOCKFILE, 'w')
-      f.close()
+    # create lockfile
+    f = open(LOCKFILE, 'w')
+    f.close()
 
-      # reorganize data
-      unreviewed_s = review_prep_data_pre_save(unreviewed)
-      approved_s = review_prep_data_pre_save(approved)
-      flagged_s = review_prep_data_pre_save(flagged)
+    # reorganize data
+    unreviewed_s = review_prep_data_pre_save(unreviewed)
+    approved_s = review_prep_data_pre_save(approved)
+    flagged_s = review_prep_data_pre_save(flagged)
 
-      save_data(unreviewed_s, 'legislators-district-offices-unreviewed.yaml')
-      save_data(approved_s, 'legislators-district-offices-approved.yaml')
-      save_data(flagged_s, 'legislators-district-offices-flagged.yaml')
+    save_data(unreviewed_s, 'legislators-district-offices-unreviewed.yaml')
+    save_data(approved_s, 'legislators-district-offices-approved.yaml')
+    save_data(flagged_s, 'legislators-district-offices-flagged.yaml')
 
-      # remove lock
-      os.unlink(LOCKFILE)
+    # remove lock
+    os.unlink(LOCKFILE)
 
-      exit(0)
 
 def review_draw_office(window, office):  
   (max_y, max_x) = window.getmaxyx()
@@ -597,18 +594,9 @@ def review():
 
       # grab input and file, if appropriate
       ch = -1
-      ch_count = 0
       while (ch<0) and quit_signal_received is False:
         ch = window.getch()
-        if ch_count==0: # no need to hammer the filesystem
-          if save_locked():
-            window.addstr(max_y-2, max_x-len('Saving... '), 'Saving...', curses.color_pair(1))
-            window.refresh()
-          else:
-            window.addstr(max_y-2, max_x-len('          '), '          ', curses.color_pair(1))
-            window.refresh()
-        ch_count = (ch_count + 1) % 500
-
+        
       if ch<256:
         c = chr(ch).upper()
         
@@ -622,7 +610,11 @@ def review():
 
         # save
         if c=='S':
+          window.addstr(max_y-2, max_x-len('Saving... '), 'Saving...', curses.color_pair(1))
+          window.refresh()
           review_save(unreviewed, approved, flagged)          
+          window.addstr(max_y-2, max_x-len('          '), '          ', curses.color_pair(1))
+          window.refresh()          
         
         # split address
         if c=='P':
