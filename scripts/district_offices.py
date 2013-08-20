@@ -145,6 +145,8 @@ def extract_info_from_html_element(state, element, meta):
   # remove CSS & JS
   match_html = re.sub('<script[^>]*>.*?<\/script[^>]*>', '', match_html, flags=(re.MULTILINE|re.DOTALL|re.IGNORECASE))
   match_html = re.sub('<style[^>]*>.*?<\/style[^>]*>', '', match_html, flags=(re.MULTILINE|re.DOTALL|re.IGNORECASE))
+  # turn a bullet character into a newline
+  match_html = re.sub(r'&#8226;', '\n', match_html, flags=(re.MULTILINE|re.DOTALL))
   # turn a close/open div pair into a <br/> -- hacky!
   match_html = re.sub(r'<\/div>\s*<div[^>]*>', '\n', match_html, flags=(re.MULTILINE|re.IGNORECASE|re.DOTALL))
   # convert <br/>'s and <p>'s into newlines
@@ -519,7 +521,8 @@ def review_draw_office(window, office):
   FIELDS = ('label', 'address_0', 'address_1', 'address_2', 'address_3', 'address_4', 'city', 'state', 'zipcode', 'phone', 'fax', 'hours', 'map_link')
   for (row, field) in enumerate(FIELDS):
     window.addstr(row+2, 1, "%10s:" % field, curses.color_pair(2))
-    window.addstr(row+2, 13, office.get(field, '')[:max_x-20], curses.color_pair(0))
+    office_field = office.get(field, '').encode('utf-8')
+    window.addstr(row+2, 13, office_field[:max_x-20], curses.color_pair(0))
   if office.has_key('confirmed_in_district'):
     window.addstr(len(FIELDS)+3, 2, "CONFIRMED IN DISTRICT", curses.color_pair(1))
   window.refresh()
@@ -586,7 +589,7 @@ def review():
       (bioguide, office) = unreviewed[0]
 
       # draw legislator name
-      window.addstr(0,3," %s  %s" % (bioguide, legislators[bioguide]), curses.color_pair(0)|curses.A_BOLD)
+      window.addstr(0,3," %s  %s" % (bioguide, legislators[bioguide].encode('utf-8')), curses.color_pair(0)|curses.A_BOLD)
       window.addstr(0,3,"[", curses.color_pair(3))
       window.addstr(0,3 + len(bioguide),"]", curses.color_pair(3))
 
