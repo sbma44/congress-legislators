@@ -573,27 +573,32 @@ def review():
 
   try:
     num_reviewed = 0
-    while len(unreviewed)>0 and quit_signal_received is False:
+    while quit_signal_received is False:
       # clear the window
       window.erase()
 
       # draw menu line across bottom
       window.addstr(max_y-4, 0, "s[P]lit address     [M]ove address_0 into label      ", curses.A_REVERSE)
       window.addstr(max_y-5, 0, "[A]pprove     [F]lag     [S]ave     s[K]ip     [Q]uit", curses.A_REVERSE)
+       
+      if len(unreviewed)>0:
+        
+        (bioguide, office) = unreviewed[0]
 
-      # draw status line
-      status_width = int(math.floor(max_x * (num_reviewed / (num_to_review * 1.0))))
-      window.addstr(max_y-1, 0, (" " * status_width), curses.A_REVERSE | curses.color_pair(1))
-      window.addstr(max_y-2, 0, "%d/%d" % (num_reviewed, num_to_review), curses.color_pair(1))
-      
-      (bioguide, office) = unreviewed[0]
+        # draw legislator name
+        window.addstr(0,3," %s  %s" % (bioguide, legislators[bioguide].encode('utf-8')), curses.color_pair(0)|curses.A_BOLD)
+        window.addstr(0,3,"[", curses.color_pair(3))
+        window.addstr(0,3 + len(bioguide),"]", curses.color_pair(3))
 
-      # draw legislator name
-      window.addstr(0,3," %s  %s" % (bioguide, legislators[bioguide].encode('utf-8')), curses.color_pair(0)|curses.A_BOLD)
-      window.addstr(0,3,"[", curses.color_pair(3))
-      window.addstr(0,3 + len(bioguide),"]", curses.color_pair(3))
+        # draw status line
+        status_width = int(math.floor(max_x * (num_reviewed / (num_to_review * 1.0))))
+        window.addstr(max_y-1, 0, (" " * status_width), curses.A_REVERSE | curses.color_pair(1))      
 
-      review_draw_office(window, office)
+        window.addstr(max_y-2, 0, "%d/%d" % (num_reviewed, num_to_review), curses.color_pair(1))
+        review_draw_office(window, office)
+      else:
+        window.addstr(0,3,"No offices remain unreviewed!", curses.color_pair(1))
+        window.refresh()
 
       # grab input and file, if appropriate
       ch = -1
@@ -642,11 +647,12 @@ def review():
         # file away entry -- skip, accept, flag
         if c in ('F', 'A', 'K'):
           unreviewed.pop(0)
+          office['_reviewed'] = datetime.datetime.now().isoformat()
           if c=='A':
             approved.append((bioguide, office))
           if c=='F':
             flagged.append((bioguide, office))          
-          num_reviewed = num_reviewed + 1
+          num_reviewed = num_reviewed + 1    
 
   finally:
     curses.nocbreak()
