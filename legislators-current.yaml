@@ -411,7 +411,7 @@
     address: 393 RUSSELL SENATE OFFICE BUILDING WASHINGTON DC 20510
     phone: 202-224-6324
     fax: 202-228-0604
-    contact_form: http://www.casey.senate.gov/contact/
+    contact_form: http://www.casey.senate.gov/contact/email-bob
     office: 393 Russell Senate Office Building
     state_rank: senior
     rss_url: http://www.casey.senate.gov/rss/feeds/?all
@@ -1507,6 +1507,9 @@
     office: 111 Russell Senate Office Building
     state_rank: junior
     rss_url: http://www.begich.senate.gov/public/?a=rss.feed
+  family:
+  - name: Nicholas J. Begich
+    relation: son
 - id:
     bioguide: C000286
     thomas: '00188'
@@ -2058,6 +2061,9 @@
     office: 521 Dirksen Senate Office Building
     state_rank: junior
     rss_url: http://www.hagan.senate.gov/rss
+  family:
+  - name: Lawton M. Chiles Jr.
+    relation: niece
 - id:
     bioguide: H000206
     thomas: '00501'
@@ -2483,6 +2489,9 @@
     office: 269 Russell Senate Office Building
     state_rank: senior
     rss_url: http://www.levin.senate.gov/rss/feeds/?type=all
+  family:
+  - name: Sander Martin Levin
+    relation: brother
 - id:
     bioguide: M000355
     thomas: '01395'
@@ -2644,6 +2653,9 @@
     office: 255 Dirksen Senate Office Building
     state_rank: senior
     rss_url: http://www.pryor.senate.gov/public/index.cfm/rss/feed
+  family:
+  - name: David H. Pryor
+    relation: son
 - id:
     bioguide: R000122
     thomas: '00949'
@@ -2920,6 +2932,13 @@
     office: 531 Hart Senate Office Building
     state_rank: senior
     rss_url: http://www.rockefeller.senate.gov/public/index.cfm/rss/feed
+  family:
+  - name: Nelson Aldrich Rockefeller
+    relation: nephew
+  - name: Nelson Aldrich
+    relation: great grandson
+  - name: Charles Harting Percy
+    relation: son in law
 - id:
     bioguide: S001141
     thomas: '01548'
@@ -3009,6 +3028,7 @@
     office: 520 Hart Senate Office Building
     state_rank: senior
     rss_url: http://www.shaheen.senate.gov/rss/
+    fax: 202-228-3194
 - id:
     bioguide: U000038
     thomas: '01595'
@@ -3082,6 +3102,15 @@
     office: 730 Hart Senate Office Building
     state_rank: senior
     rss_url: http://markudall.senate.gov/rss/?p=blog
+  family:
+  - name: Morris K. Udall
+    relation: son
+  - name: Thomas Udall
+    relation: cousin
+  - name: Stewart Lee Udall
+    relation: nephew
+  - name: Gordon H. Smith
+    relation: cousin
 - id:
     bioguide: U000039
     thomas: '01567'
@@ -3156,6 +3185,15 @@
     office: 110 Hart Senate Office Building
     state_rank: senior
     rss_url: http://tomudall.senate.gov/rss/?p=blog
+  family:
+  - name: Stewart Lee Udall
+    relation: son
+  - name: Morris K. Udall
+    relation: nephew
+  - name: Mark Udall
+    relation: cousin
+  - name: Gordon H. Smith
+    relation: cousin
 - id:
     bioguide: W000805
     thomas: '01897'
@@ -3383,6 +3421,7 @@
     office: 306 Hart Senate Office Building
     state_rank: junior
     rss_url: http://www.manchin.senate.gov/public/index.cfm/rss/feed
+    fax: 202-228-0002
 - id:
     bioguide: A000055
     thomas: '01460'
@@ -3479,83 +3518,6 @@
     contact_form: http://aderholt.house.gov/?sectionid=195&amp;sectiontree=195
     office: 2369 Rayburn House Office Building
     rss_url: http://aderholt.house.gov/common/rss//index.cfm?rss=20
-- id:
-    bioguide: A000361
-    thomas: '01727'
-    govtrack: 400006
-    opensecrets: N00025464
-    votesmart: 4545
-    fec:
-    - H2LA05084
-    cspan: 1004256
-    wikipedia: Rodney Alexander
-    house_history: 8757
-    ballotpedia: Rodney Alexander
-    maplight: 4126
-    washington_post: gIQALw6OAP
-    icpsr: 90327
-  name:
-    first: Rodney
-    middle: M.
-    last: Alexander
-    official_full: Rodney Alexander
-  bio:
-    birthday: '1946-12-05'
-    gender: M
-  terms:
-  - type: rep
-    start: '2003-01-07'
-    end: '2004-12-09'
-    state: LA
-    district: 5
-    party: Democrat
-    url: http://www.house.gov/alexander/
-  - type: rep
-    start: '2005-01-04'
-    end: '2006-12-09'
-    state: LA
-    district: 5
-    party: Republican
-    url: http://www.house.gov/alexander/
-  - type: rep
-    start: '2007-01-04'
-    end: '2009-01-03'
-    state: LA
-    district: 5
-    party: Republican
-    url: http://www.house.gov/alexander
-  - type: rep
-    start: '2009-01-06'
-    end: '2010-12-22'
-    state: LA
-    district: 5
-    party: Republican
-    url: http://alexander.house.gov/
-  - type: rep
-    start: '2011-01-05'
-    end: '2013-01-03'
-    state: LA
-    district: 5
-    party: Republican
-    url: http://alexander.house.gov/
-    address: 316 Cannon HOB; Washington DC 20515-1805
-    phone: 202-225-8490
-    fax: 202-225-5639
-    contact_form: http://www.house.gov/alexander/content/webform/zipauth.htm
-    office: 316 Cannon House Office Building
-  - type: rep
-    start: '2013-01-03'
-    end: '2015-01-03'
-    state: LA
-    party: Republican
-    district: 5
-    url: http://alexander.house.gov
-    address: 316 Cannon HOB; Washington DC 20515-1805
-    phone: 202-225-8490
-    fax: 202-225-5639
-    contact_form: https://alexander.house.gov/email-me
-    office: 316 Cannon House Office Building
-    rss_url: http://alexander.house.gov/rss/press-releases-statements.xml
 - id:
     bioguide: A000367
     thomas: '02029'
@@ -4578,6 +4540,9 @@
     contact_form: http://bilirakis.house.gov/index.php?option=com_content&amp;task=view&amp;id=212&amp;Itemid=44
     office: 2313 Rayburn House Office Building
     rss_url: http://bilirakis.house.gov/index.php?format=feed&amp;type=rss
+  family:
+  - name: Michael Bilirakis
+    relation: son
 - id:
     bioguide: B001250
     thomas: '01753'
@@ -5184,6 +5149,7 @@
     office: 260 Russell Senate Office Building
     state_rank: junior
     rss_url: http://www.blunt.senate.gov/public/?a=rss.feed
+    fax: 202-224-8149
 - id:
     bioguide: B000589
     thomas: '00102'
@@ -5307,83 +5273,6 @@
     office: 1011 Longworth House Office Building
     rss_url: http://boehner.house.gov/news/rss.aspx
 - id:
-    bioguide: B001244
-    thomas: '01703'
-    govtrack: 400038
-    opensecrets: N00025330
-    votesmart: 27522
-    fec:
-    - H2AL01077
-    cspan: 1003546
-    wikipedia: Jo Bonner
-    house_history: 10387
-    ballotpedia: Jo Bonner
-    maplight: 4154
-    washington_post: gIQAoL2cKP
-    icpsr: 20300
-  name:
-    first: Jo
-    last: Bonner
-    official_full: Jo Bonner
-  bio:
-    birthday: '1959-11-19'
-    gender: M
-    religion: Episcopalian
-  terms:
-  - type: rep
-    start: '2003-01-07'
-    end: '2004-12-09'
-    state: AL
-    district: 1
-    party: Republican
-    url: http://www.house.gov/bonner
-  - type: rep
-    start: '2005-01-04'
-    end: '2006-12-09'
-    state: AL
-    district: 1
-    party: Republican
-    url: http://www.house.gov/bonner
-  - type: rep
-    start: '2007-01-04'
-    end: '2009-01-03'
-    state: AL
-    district: 1
-    party: Republican
-    url: http://bonner.house.gov
-  - type: rep
-    start: '2009-01-06'
-    end: '2010-12-22'
-    state: AL
-    district: 1
-    party: Republican
-    url: http://bonner.house.gov
-  - type: rep
-    start: '2011-01-05'
-    end: '2013-01-03'
-    state: AL
-    district: 1
-    party: Republican
-    url: http://bonner.house.gov
-    address: 2236 Rayburn HOB; Washington DC 20515-0101
-    phone: 202-225-4931
-    fax: 202-225-0562
-    contact_form: https://forms.house.gov/bonner/webforms/issue_subscribe.html
-    office: 2236 Rayburn House Office Building
-  - type: rep
-    start: '2013-01-03'
-    end: '2015-01-03'
-    state: AL
-    party: Republican
-    district: 1
-    url: http://bonner.house.gov
-    address: 2236 Rayburn HOB; Washington DC 20515-0101
-    phone: 202-225-4931
-    fax: 202-225-0562
-    contact_form: https://forms.house.gov/bonner/webforms/issue_subscribe.html
-    office: 2236 Rayburn House Office Building
-    rss_url: http://bonner.house.gov/index.php?format=feed&amp;type=rss
-- id:
     bioguide: B001236
     thomas: '01687'
     lis: S343
@@ -5455,6 +5344,7 @@
     office: 320 Hart Senate Office Building
     state_rank: junior
     rss_url: http://www.boozman.senate.gov/public/index.cfm/rss/feed
+    fax: 202-228-1371
 - id:
     bioguide: B001245
     thomas: '01723'
@@ -6968,6 +6858,9 @@
     contact_form: https://forms.house.gov/wyr/welcome.shtml
     office: 2366 Rayburn House Office Building
     rss_url: http://capito.house.gov/common/rss//index.cfm?rss=85
+  family:
+  - name: Arch Alfred Moore Jr.
+    relation: daughter
 - id:
     bioguide: C001036
     thomas: '01471'
@@ -7062,6 +6955,9 @@
     contact_form: http://capps.house.gov/contact-me/email-me
     office: 2231 Rayburn House Office Building
     rss_url: http://capps.house.gov/rss.xml
+  family:
+  - name: Walter Capps
+    relation: wife
 - id:
     bioguide: C001037
     thomas: '01564'
@@ -7263,6 +7159,9 @@
     contact_form: https://forms.house.gov/carson/webforms/issue_subscribe.htm
     office: 2453 Rayburn House Office Building
     rss_url: http://carson.house.gov/index.php?option=com_bca-rss-syndicator&amp;feed_id=1
+  family:
+  - name: Julia Carson
+    relation: grandson
 - id:
     bioguide: C001051
     thomas: '01752'
@@ -7950,6 +7849,9 @@
     fax: 202-226-3717
     contact_form: http://lacyclay.house.gov/contact-us/
     office: 2418 Rayburn House Office Building
+  family:
+  - name: William Lacy Clay Sr.
+    relation: son
 - id:
     bioguide: C001061
     thomas: '01790'
@@ -8127,6 +8029,9 @@
     contact_form: http://clyburn.house.gov/contact-me/email-me
     office: 242 Cannon House Office Building
     rss_url: http://clyburn.house.gov/rss.xml
+  family:
+  - name: George Washington Murray
+    relation: relative
 - id:
     bioguide: C000542
     thomas: '00209'
@@ -10506,6 +10411,9 @@
     contact_form: http://mariodiazbalart.house.gov/contact-mario
     office: 436 Cannon House Office Building
     rss_url: http://mariodiazbalart.house.gov/rss.xml
+  family:
+  - name: Lincoln Diaz Balart
+    relation: brother
 - id:
     bioguide: D000355
     thomas: '00299'
@@ -10728,6 +10636,9 @@
     contact_form: https://forms.house.gov/wyr/welcome.shtml
     office: 2328 Rayburn House Office Building
     rss_url: http://dingell.house.gov/rss.xml
+  family:
+  - name: John David Dingell
+    relation: son
 - id:
     bioguide: D000399
     thomas: '00303'
@@ -11044,6 +10955,7 @@
     office: 1208 Longworth House Office Building
     rss_url: http://duffy.house.gov/rss.xml
     contact_form: http://duffy.house.gov/contact-me/email-me
+    fax: 202-225-3240
 - id:
     bioguide: D000615
     thomas: '02057'
@@ -11218,6 +11130,9 @@
     contact_form: http://duncan.house.gov/contact-me/email-me
     office: 2207 Rayburn House Office Building
     rss_url: http://duncan.house.gov/rss.xml
+  family:
+  - name: John James Duncan
+    relation: son
 - id:
     bioguide: E000290
     thomas: '01894'
@@ -11752,7 +11667,7 @@
     last: Farenthold
     official_full: Blake Farenthold
   bio:
-    birthday: '1962-12-12'
+    birthday: '1961-12-12'
     gender: M
   terms:
   - type: rep
@@ -12275,6 +12190,11 @@
     contact_form: https://fleming.house.gov/contact/contactform.htm
     office: 416 Cannon House Office Building
     rss_url: http://fleming.house.gov/news/rss.aspx
+  family:
+  - name: Henry Clay
+    relation: relative
+  - name: James Brown Clay
+    relation: relative
 - id:
     bioguide: F000461
     thomas: '02065'
@@ -12721,6 +12641,13 @@
     contact_form: http://frelinghuysen.house.gov/contactus/form.cfm
     office: 2306 Rayburn House Office Building
     rss_url: http://frelinghuysen.house.gov/common/rss/?rss=3
+  family:
+  - name: Peter Hood Ballantine Frelinghuysen Jr.
+    relation: son
+  - name: Frederick Frelinghuysen
+    relation: great great grandson
+  - name: Theodore Frelinghuysen
+    relation: great great great nephew
 - id:
     bioguide: F000455
     thomas: '01895'
@@ -12883,6 +12810,7 @@
     office: 213 Cannon House Office Building
     rss_url: http://gardner.house.gov/rss.xml
     contact_form: http://gardner.house.gov/contact-me
+    fax: 202-225-5870
 - id:
     bioguide: G000548
     thomas: '01737'
@@ -14273,8 +14201,8 @@
   name:
     first: Luis
     middle: V.
-    last: Gutierrez
-    official_full: Luis V. Gutierrez
+    last: Gutiérrez
+    official_full: Luis V. Gutiérrez
   bio:
     birthday: '1953-12-10'
     gender: M
@@ -15058,7 +14986,7 @@
     address: 702 HART SENATE OFFICE BUILDING WASHINGTON DC 20510
     phone: 202-224-5521
     fax: 202-225-4975
-    contact_form: http://www.heinrich.senate.gov/contact.cfm
+    contact_form: http://www.heinrich.senate.gov/contact
     office: 702 Hart Senate Office Building
     state_rank: junior
 - id:
@@ -15507,6 +15435,7 @@
     office: 338 Russell Senate Office Building
     state_rank: senior
     rss_url: http://www.hoeven.senate.gov/public/index.cfm/rss/feed
+    fax: 202-224-7999
 - id:
     bioguide: H001032
     thomas: '01580'
@@ -15596,6 +15525,9 @@
     contact_form: https://forms.house.gov/holt/webforms/issue_subscribe.htm
     office: 1214 Longworth House Office Building
     rss_url: http://holt.house.gov/index.php?format=feed&amp;type=rss
+  family:
+  - name: Rush D. Holt
+    relation: son
 - id:
     bioguide: H001034
     thomas: '01634'
@@ -16036,6 +15968,9 @@
     contact_form: http://hunter.house.gov/contact-me/email-me
     office: 223 Cannon House Office Building
     rss_url: http://hunter.house.gov/rss.xml
+  family:
+  - name: Duncan Lee Hunter
+    relation: son
 - id:
     bioguide: H001060
     thomas: '02069'
@@ -16729,6 +16664,7 @@
     office: 328 Hart Senate Office Building
     state_rank: senior
     rss_url: http://www.ronjohnson.senate.gov/public/index.cfm/rss/feed
+    fax: 920-230-7262
 - id:
     bioguide: J000174
     thomas: '00603'
@@ -16945,6 +16881,9 @@
     contact_form: http://jones.house.gov/contact-me/email-me
     office: 2333 Rayburn House Office Building
     rss_url: http://jones.house.gov/rss.xml
+  family:
+  - name: Walter Beaman Jones Sr.
+    relation: son
 - id:
     bioguide: J000289
     thomas: '01868'
@@ -18462,6 +18401,9 @@
     contact_form: http://latta.house.gov/contact/
     office: 2448 Rayburn House Office Building
     rss_url: http://latta.house.gov/news/rss.aspx
+  family:
+  - name: 'Delbert L. Latta '
+    relation: son
 - id:
     bioguide: L000174
     thomas: '01383'
@@ -18807,6 +18749,9 @@
     contact_form: http://levin.house.gov/contact-me/email-me
     office: 1236 Longworth House Office Building
     rss_url: http://levin.house.gov/rss.xml
+  family:
+  - name: Carl Levin
+    relation: brother
 - id:
     bioguide: L000287
     thomas: '00688'
@@ -19002,6 +18947,9 @@
     contact_form: http://www.house.gov/formlipinski/zipauth.html
     office: 1717 Longworth House Office Building
     rss_url: http://www.lipinski.house.gov/common/rss//index.cfm?rss=25
+  family:
+  - name: William Oliver Lipinski
+    relation: son
 - id:
     bioguide: L000554
     thomas: '00699'
@@ -19644,7 +19592,7 @@
     party: Democrat
     district: 3
     url: http://lujan.house.gov
-    address: 2446 Rayburn HOB; Washington DC 20515-3703
+    address: 2446 Rayburn HOB; Washington DC 20515-3103
     phone: 202-225-6190
     fax: 202-226-1528
     contact_form: https://forms.house.gov/lujan/contact-form.shtml
@@ -20185,7 +20133,11 @@
     party: Democrat
     class: 2
     state_rank: junior
-    url: http://markey.senate.gov
+    url: http://www.markey.senate.gov
+    phone: 202-224-2742
+    office: 218 Russell Senate Office Building
+    address: 218 RUSSELL SENATE OFFICE BUILDING WASHINGTON DC 20510
+    contact_form: http://www.markey.senate.gov/contact.cfm
 - id:
     bioguide: M001142
     thomas: '01671'
@@ -20336,6 +20288,9 @@
     contact_form: https://forms.house.gov/matsui/webforms/issue_subscribe.htm
     office: 2434 Rayburn House Office Building
     rss_url: http://matsui.house.gov/index.php?format=feed&amp;type=rss
+  family:
+  - name: Robert Matsui
+    relation: wife
 - id:
     bioguide: M000303
     thomas: '00754'
@@ -21179,7 +21134,6 @@
     wikipedia: Buck McKeon
     maplight: 4360
     washington_post: gIQAJpXHAP
-    wikipedia: Howard McKeon
     icpsr: 29315
   name:
     first: Howard
@@ -21703,6 +21657,9 @@
     contact_form: http://mica.house.gov/contact-me/
     office: 2187 Rayburn House Office Building
     rss_url: http://mica.house.gov/common/rss/index.cfm?rss=25
+  family:
+  - name: Daniel Andrew Mica
+    relation: brother
 - id:
     bioguide: M001149
     thomas: '01730'
@@ -22659,6 +22616,9 @@
     office: 709 Hart Senate Office Building
     state_rank: senior
     rss_url: http://www.murkowski.senate.gov/public/?a=rss.feed
+  family:
+  - name: Frank Hughes Murkowski
+    relation: daughter
 - id:
     bioguide: M001169
     thomas: '01837'
@@ -24117,6 +24077,9 @@
     office: 124 Russell Senate Office Building
     state_rank: junior
     rss_url: http://paul.senate.gov/rss/?p=news
+  family:
+  - name: Ronald Ernest Paul
+    relation: son
 - id:
     bioguide: P000594
     thomas: '01930'
@@ -24374,6 +24337,9 @@
     contact_form: http://pelosi.house.gov/contact/email-me.shtml
     office: 235 Cannon House Office Building
     rss_url: http://pelosi.house.gov/atom.xml
+  family:
+  - name: Thomas D?Alesandro Jr.
+    relation: daughter
 - id:
     bioguide: P000593
     thomas: '01835'
@@ -26814,6 +26780,7 @@
     office: 236 Cannon House Office Building
     rss_url: http://rokita.house.gov/rss.xml
     contact_form: http://rokita.house.gov/contact-me/email-me
+    fax: 202-226-0544
 - id:
     bioguide: R000583
     thomas: '01916'
@@ -27207,6 +27174,9 @@
     contact_form: http://www.house.gov/writerep
     office: 2330 Rayburn House Office Building
     rss_url: http://roybal-allard.house.gov/news/rss.aspx
+  family:
+  - name: Edward R. Roybal
+    relation: daughter
 - id:
     bioguide: R000487
     thomas: '00998'
@@ -27898,6 +27868,9 @@
     contact_form: http://www.lorettasanchez.house.gov/index.php?option=com_content&amp;task=view&amp;id=218&amp;Itemid=17
     office: 1114 Longworth House Office Building
     rss_url: http://lorettasanchez.house.gov/rss.xml
+  family:
+  - name: Linda S?nchez
+    relation: sister
 - id:
     bioguide: S001168
     thomas: '01854'
@@ -27959,6 +27932,9 @@
     contact_form: http://sarbanes.house.gov/federal.asp
     office: 2444 Rayburn House Office Building
     rss_url: http://sarbanes.house.gov/rss_news.asp
+  family:
+  - name: Senator Paul Sarbanes
+    relation: son
 - id:
     bioguide: S001176
     thomas: '01892'
@@ -28522,6 +28498,7 @@
     office: 1205 Longworth House Office Building
     rss_url: http://schweikert.house.gov/rss/press-releases.xml
     contact_form: http://schweikert.house.gov/contact-form/
+    fax: 202-225-0096
 - id:
     bioguide: S001189
     thomas: '02009'
@@ -28587,7 +28564,7 @@
     last: Scott
     official_full: David Scott
   bio:
-    birthday: '1946-06-27'
+    birthday: '1945-06-27'
     gender: M
     religion: Baptist
   terms:
@@ -28799,7 +28776,7 @@
     fax: 202-225-3407
     office: 167 Russell Senate Office Building
     state_rank: junior
-    contact_form: http://www.scott.senate.gov/contact
+    contact_form: http://www.scott.senate.gov/contact/email-me
     rss_url: http://www.scott.senate.gov/rss.xml
 - id:
     bioguide: S000244
@@ -29569,6 +29546,9 @@
     contact_form: http://shuster.house.gov/index.cfm?sectionid=58
     office: 2209 Rayburn House Office Building
     rss_url: http://shuster.house.gov/common/rss//index.cfm?rss=49
+  family:
+  - name: E. G. ?Bud? Shuster
+    relation: son
 - id:
     bioguide: S001148
     thomas: '01590'
@@ -30556,6 +30536,9 @@
     contact_form: http://www.house.gov/writerep
     office: 2423 Rayburn House Office Building
     rss_url: http://lindasanchez.house.gov/index.php?format=feed&amp;type=rss
+  family:
+  - name: Loretta Sanchez
+    relation: sister
 - id:
     bioguide: T000459
     thomas: '01566'
@@ -31452,6 +31435,9 @@
     contact_form: http://tsongas.house.gov/?sectionid=11&amp;sectiontree=3,11
     office: 1607 Longworth House Office Building
     rss_url: http://tsongas.house.gov/rss/press-releases.xml
+  family:
+  - name: Paul Tsongas
+    relation: wife
 - id:
     bioguide: T000463
     thomas: '01741'
@@ -33610,180 +33596,6 @@
     rss_url: http://yoder.house.gov/common/rss/index.cfm?rss=49
     contact_form: http://yoder.house.gov/email-me/
 - id:
-    bioguide: Y000031
-    thomas: '01255'
-    govtrack: 400439
-    opensecrets: N00001817
-    votesmart: 26802
-    icpsr: 13047
-    fec:
-    - H6FL06035
-    cspan: 5259
-    wikipedia: Bill Young
-    house_history: 21068
-    ballotpedia: C.W. Bill Young
-    maplight: 4521
-    washington_post: gIQAcWcEAP
-  name:
-    first: C.
-    middle: W. Bill
-    last: Young
-    official_full: C. W. Bill Young
-  bio:
-    birthday: '1930-12-16'
-    gender: M
-    religion: Methodist
-  terms:
-  - type: rep
-    start: '1971-01-21'
-    end: '1972-10-18'
-    state: FL
-    district: 8
-    party: Republican
-  - type: rep
-    start: '1973-01-03'
-    end: '1974-12-20'
-    state: FL
-    district: 6
-    party: Republican
-  - type: rep
-    start: '1975-01-14'
-    end: '1976-10-01'
-    state: FL
-    district: 6
-    party: Republican
-  - type: rep
-    start: '1977-01-04'
-    end: '1978-10-15'
-    state: FL
-    district: 6
-    party: Republican
-  - type: rep
-    start: '1979-01-15'
-    end: '1980-12-16'
-    state: FL
-    district: 6
-    party: Republican
-  - type: rep
-    start: '1981-01-05'
-    end: '1982-12-23'
-    state: FL
-    district: 6
-    party: Republican
-  - type: rep
-    start: '1983-01-03'
-    end: '1984-10-12'
-    state: FL
-    district: 8
-    party: Republican
-  - type: rep
-    start: '1985-01-03'
-    end: '1986-10-18'
-    state: FL
-    district: 8
-    party: Republican
-  - type: rep
-    start: '1987-01-06'
-    end: '1988-10-22'
-    state: FL
-    district: 8
-    party: Republican
-  - type: rep
-    start: '1989-01-03'
-    end: '1990-10-28'
-    state: FL
-    district: 8
-    party: Republican
-  - type: rep
-    start: '1991-01-03'
-    end: '1992-10-09'
-    state: FL
-    district: 8
-    party: Republican
-  - type: rep
-    start: '1993-01-05'
-    end: '1994-12-01'
-    state: FL
-    district: 10
-    party: Republican
-  - type: rep
-    start: '1995-01-04'
-    end: '1996-10-04'
-    state: FL
-    district: 10
-    party: Republican
-  - type: rep
-    start: '1997-01-07'
-    end: '1998-12-19'
-    state: FL
-    district: 10
-    party: Republican
-  - type: rep
-    start: '1999-01-06'
-    end: '2000-12-15'
-    state: FL
-    district: 10
-    party: Republican
-  - type: rep
-    start: '2001-01-03'
-    end: '2002-11-22'
-    state: FL
-    district: 10
-    party: Republican
-  - type: rep
-    start: '2003-01-07'
-    end: '2004-12-09'
-    state: FL
-    district: 10
-    party: Republican
-    url: http://www.house.gov/young
-  - type: rep
-    start: '2005-01-04'
-    end: '2006-12-09'
-    state: FL
-    district: 10
-    party: Republican
-    url: http://www.house.gov/young
-  - type: rep
-    start: '2007-01-04'
-    end: '2009-01-03'
-    state: FL
-    district: 10
-    party: Republican
-    url: http://www.house.gov/young
-  - type: rep
-    start: '2009-01-06'
-    end: '2010-12-22'
-    state: FL
-    district: 10
-    party: Republican
-    url: http://www.house.gov/young
-  - type: rep
-    start: '2011-01-05'
-    end: '2013-01-03'
-    state: FL
-    district: 10
-    party: Republican
-    url: http://www.house.gov/young
-    address: 2407 Rayburn HOB; Washington DC 20515-0910
-    phone: 202-225-5961
-    fax: 202-225-9764
-    contact_form: http://www.house.gov/writerep
-    office: 2407 Rayburn House Office Building
-  - type: rep
-    start: '2013-01-03'
-    end: '2015-01-03'
-    state: FL
-    party: Republican
-    district: 13
-    url: http://www.house.gov/young
-    address: 2407 Rayburn HOB; Washington DC 20515-0910
-    phone: 202-225-5961
-    fax: 202-225-9764
-    contact_form: http://www.house.gov/writerep
-    office: 2407 Rayburn House Office Building
-    rss_url: http://young.house.gov/rss.xml
-- id:
     bioguide: Y000033
     thomas: '01256'
     govtrack: 400440
@@ -34215,6 +34027,7 @@
     contact_form: https://bonamici.house.gov/contact-me
     office: 439 Cannon House Office Building
     rss_url: http://bonamici.house.gov/rss.xml
+    fax: 202-225-9497
 - id:
     bioguide: B001279
     thomas: '02093'
@@ -34307,6 +34120,7 @@
     office: 318 Cannon House Office Building
     rss_url: http://delbene.house.gov/rss.xml
     contact_form: http://delbene.house.gov/contact-me/email-me
+    fax: 202-226-1606
 - id:
     bioguide: M001184
     govtrack: 412503
@@ -34351,6 +34165,7 @@
     office: 314 Cannon House Office Building
     rss_url: http://massie.house.gov/rss.xml
     contact_form: https://massieforms.house.gov/forms/emailsignup/
+    fax: 202-225-0003
 - id:
     bioguide: P000604
     govtrack: 412506
@@ -34395,6 +34210,9 @@
     url: http://payne.house.gov
     rss_url: http://payne.house.gov/rss.xml
     contact_form: http://payne.house.gov/contact/email-me
+  family:
+  - name: Donald Milford Payne
+    relation: son
 - id:
     lis: S353
     thomas: '02173'
@@ -34480,11 +34298,12 @@
     party: Republican
     district: 5
     office: 2349 Rayburn House Office Building
-    address: 2349 Rayburn HOB; Washington DC 20515-6601
+    address: 2349 Rayburn HOB; Washington DC 20515-0305
     phone: 202-225-2635
     url: http://salmon.house.gov
     rss_url: http://salmon.house.gov/rss.xml
     contact_form: http://salmon.house.gov/contact/email-me
+    fax: 202-226-4386
 - id:
     bioguide: S000937
     thomas: '01114'
@@ -34526,6 +34345,7 @@
     url: http://stockman.house.gov
     rss_url: http://stockman.house.gov/rss.xml
     contact_form: http://stockman.house.gov/contact/email-me
+    fax: 202-226-0396
 - id:
     bioguide: S001170
     thomas: '01861'
@@ -34620,10 +34440,11 @@
     district: 11
     url: http://foster.house.gov
     office: 1224 Longworth House Office Building
-    address: 1224 Longworth HOB; Washington DC 20515-3808
+    address: 1224 Longworth HOB; Washington DC 20515-1311
     phone: 202-225-3515
     rss_url: http://foster.house.gov/rss.xml
     contact_form: http://foster.house.gov/contact/email-me
+    fax: 202-225-9420
 - id:
     bioguide: G000556
     thomas: '01914'
@@ -34662,10 +34483,11 @@
     district: 9
     url: http://grayson.house.gov
     office: 430 Cannon House Office Building
-    address: 430 Cannon HOB; Washington DC 20515-6601
+    address: 430 Cannon HOB; Washington DC 20515-0909
     phone: 202-225-9889
     rss_url: http://grayson.house.gov/rss.xml
     contact_form: https://grayson.house.gov/contact/email-me
+    fax: 202-225-9742
 - id:
     bioguide: K000368
     thomas: '01907'
@@ -34704,10 +34526,11 @@
     district: 1
     url: http://kirkpatrick.house.gov
     office: 330 Cannon House Office Building
-    address: 330 Cannon HOB; Washington DC 20515-6601
+    address: 330 Cannon HOB; Washington DC 20515-0301
     phone: 202-225-3361
     rss_url: http://kirkpatrick.house.gov/rss.xml
     contact_form: http://kirkpatrick.house.gov/contact/email-me
+    fax: 202-225-3462
 - id:
     bioguide: M001171
     thomas: '01943'
@@ -34751,6 +34574,7 @@
     phone: 202-225-3701
     rss_url: http://maffei.house.gov/rss.xml
     contact_form: http://maffei.house.gov/contact/email-me
+    fax: 202-225-4042
 - id:
     bioguide: T000468
     thomas: '01940'
@@ -34860,6 +34684,7 @@
     url: http://sinema.house.gov
     rss_url: http://sinema.house.gov/index.cfm/rss/feed
     contact_form: https://sinema.house.gov/index.cfm/email-me
+    fax: 202-225-9731
 - id:
     govtrack: 412510
     bioguide: L000578
@@ -34890,11 +34715,12 @@
     party: Republican
     district: 1
     office: 506 Cannon House Office Building
-    address: 506 Cannon HOB; Washington DC 20515-0912
+    address: 506 Cannon HOB; Washington DC 20515-0501
     phone: 202-225-3076
     url: http://lamalfa.house.gov
     rss_url: http://lamalfa.house.gov/rss.xml
     contact_form: http://lamalfa.house.gov/contact/email-me
+    fax: 530-534-7800
 - id:
     govtrack: 412511
     bioguide: H001068
@@ -34924,11 +34750,12 @@
     party: Democrat
     district: 2
     office: 1630 Longworth House Office Building
-    address: 1630 Longworth HOB; Washington DC 20515-2002
+    address: 1630 Longworth HOB; Washington DC 20515-0502
     phone: 202-225-5161
     url: http://huffman.house.gov
     rss_url: http://huffman.house.gov/rss.xml
     contact_form: http://huffman.house.gov/contact/email-me
+    fax: 202-225-5163
 - id:
     govtrack: 412512
     bioguide: B001287
@@ -34958,11 +34785,12 @@
     party: Democrat
     district: 7
     office: 1408 Longworth House Office Building
-    address: 1408 Longworth HOB; Washington DC 20515-6601
+    address: 1408 Longworth HOB; Washington DC 20515-0507
     phone: 202-225-5716
     url: http://bera.house.gov
     rss_url: http://bera.house.gov/rss.xml
     contact_form: http://bera.house.gov/contact
+    fax: 202-226-1298
 - id:
     govtrack: 412513
     bioguide: C001094
@@ -34992,7 +34820,7 @@
     party: Republican
     district: 8
     office: 1222 Longworth House Office Building
-    address: 1222 Longworth HOB; Washington DC 20515-6601
+    address: 1222 Longworth HOB; Washington DC 20515-0508
     phone: 202-225-5861
     url: http://cook.house.gov
     rss_url: http://cook.house.gov/rss.xml
@@ -35026,7 +34854,7 @@
     party: Democrat
     district: 15
     office: 501 Cannon House Office Building
-    address: 501 Cannon HOB; Washington DC 20515-3604
+    address: 501 Cannon HOB; Washington DC 20515-0515
     phone: 202-225-5065
     url: http://swalwell.house.gov
     contact_form: http://swalwell.house.gov/contact-me
@@ -35060,11 +34888,12 @@
     party: Republican
     district: 21
     office: 1004 Longworth House Office Building
-    address: 1004 Longworth HOB; Washington DC 20515-1703
+    address: 1004 Longworth HOB; Washington DC 20515-0521
     phone: 202-225-4695
     url: http://valadao.house.gov
     rss_url: http://valadao.house.gov/rss.xml
     contact_form: http://valadao.house.gov/contact
+    fax: 202-226-3196
 - id:
     govtrack: 412516
     bioguide: B001285
@@ -35094,11 +34923,12 @@
     party: Democrat
     district: 26
     office: 1019 Longworth House Office Building
-    address: 1019 Longworth HOB; Washington DC 20515-6601
+    address: 1019 Longworth HOB; Washington DC 20515-0526
     phone: 202-225-5811
     url: http://juliabrownley.house.gov
     rss_url: http://juliabrownley.house.gov/rss.xml
     contact_form: http://juliabrownley.house.gov/contact/email-me
+    fax: 202-225-1100
 - id:
     govtrack: 412517
     bioguide: C001097
@@ -35128,11 +34958,12 @@
     party: Democrat
     district: 29
     office: 1508 Longworth House Office Building
-    address: 1508 Longworth HOB; Washington DC 20515-6601
+    address: 1508 Longworth HOB; Washington DC 20515-0529
     phone: 202-225-6131
     url: http://cardenas.house.gov
     rss_url: http://cardenas.house.gov/rss.xml
     contact_form: http://cardenas.house.gov/contact/email-me
+    fax: 202-225-0819
 - id:
     govtrack: 412518
     bioguide: N000187
@@ -35162,11 +34993,12 @@
     party: Democrat
     district: 35
     office: 1641 Longworth House Office Building
-    address: 1641 Longworth HOB; Washington DC 20515-3005
+    address: 1641 Longworth HOB; Washington DC 20515-0535
     phone: 202-225-6161
     url: http://negretemcleod.house.gov
     rss_url: http://negretemcleod.house.gov/rss.xml
     contact_form: http://negretemcleod.house.gov/contact
+    fax: 202-225-8671
 - id:
     govtrack: 412519
     bioguide: R000599
@@ -35196,7 +35028,7 @@
     party: Democrat
     district: 36
     office: 1319 Longworth House Office Building
-    address: 1319 Longworth HOB; Washington DC 20515-1305
+    address: 1319 Longworth HOB; Washington DC 20515-0536
     phone: 202-225-5330
     url: http://ruiz.house.gov
     rss_url: http://ruiz.house.gov/rss.xml
@@ -35230,7 +35062,7 @@
     party: Democrat
     district: 41
     office: 1507 Longworth House Office Building
-    address: 1507 Longworth HOB; Washington DC 20515-4328
+    address: 1507 Longworth HOB; Washington DC 20515-0541
     phone: 202-225-2305
     url: http://takano.house.gov
     rss_url: http://takano.house.gov/rss.xml
@@ -35265,11 +35097,12 @@
     party: Democrat
     district: 47
     office: 515 Cannon House Office Building
-    address: 515 Cannon HOB; Washington DC 20515-1309
+    address: 515 Cannon HOB; Washington DC 20515-0547
     phone: 202-225-7924
     url: http://lowenthal.house.gov
     rss_url: http://lowenthal.house.gov/news/rss.aspx
     contact_form: http://lowenthal.house.gov/contact/email-me
+    fax: 202-225-7926
 - id:
     govtrack: 412522
     bioguide: V000130
@@ -35299,11 +35132,12 @@
     party: Democrat
     district: 51
     office: 1605 Longworth House Office Building
-    address: 1605 Longworth HOB; Washington DC 20515-1406
+    address: 1605 Longworth HOB; Washington DC 20515-0551
     phone: 202-225-8045
     url: http://vargas.house.gov
     rss_url: http://vargas.house.gov/rss.xml
     contact_form: http://vargas.house.gov/contact/email-me
+    fax: 202-225-9073
 - id:
     govtrack: 412523
     bioguide: P000608
@@ -35339,6 +35173,7 @@
     url: http://scottpeters.house.gov
     rss_url: http://scottpeters.house.gov/rss.xml
     contact_form: http://scottpeters.house.gov/contact/email-me
+    fax: 202-225-2558
 - id:
     govtrack: 412524
     bioguide: E000293
@@ -35374,6 +35209,7 @@
     url: http://esty.house.gov
     rss_url: http://esty.house.gov/rss.xml
     contact_form: http://esty.house.gov/contact/email-me
+    fax: 202-225-5933
 - id:
     govtrack: 412525
     bioguide: Y000065
@@ -35404,7 +35240,7 @@
     party: Republican
     district: 3
     office: 511 Cannon House Office Building
-    address: 511 Cannon HOB; Washington DC 20515-0607
+    address: 511 Cannon HOB; Washington DC 20515-0903
     phone: 202-225-5744
     url: http://yoho.house.gov
     rss_url: http://yoho.house.gov/rss.xml
@@ -35438,11 +35274,12 @@
     party: Republican
     district: 6
     office: 427 Cannon House Office Building
-    address: 427 Cannon HOB; Washington DC 20515-6601
+    address: 427 Cannon HOB; Washington DC 20515-0906
     phone: 202-225-2706
     url: http://desantis.house.gov
     rss_url: http://desantis.house.gov/rss.xml
     contact_form: http://desantis.house.gov/contact/email-me
+    fax: 202-226-6299
 - id:
     opensecrets: N00033091
     govtrack: 412527
@@ -35472,11 +35309,12 @@
     party: Democrat
     district: 18
     office: 1517 Longworth House Office Building
-    address: 1517 Longworth HOB; Washington DC 20515-1004
+    address: 1517 Longworth HOB; Washington DC 20515-0918
     phone: 202-225-3026
     url: http://patrickmurphy.house.gov
     rss_url: http://patrickmurphy.house.gov/news/rss.aspx
     contact_form: http://patrickmurphy.house.gov/contact/officeinformation.htm
+    fax: 202-225-8398
 - id:
     govtrack: 412528
     bioguide: R000596
@@ -35506,7 +35344,7 @@
     party: Republican
     district: 19
     office: 1123 Longworth House Office Building
-    address: 1123 Longworth HOB; Washington DC 20515-4601
+    address: 1123 Longworth HOB; Washington DC 20515-0919
     phone: 202-225-2536
     url: http://radel.house.gov
     rss_url: http://radel.house.gov/news/rss.aspx
@@ -35541,11 +35379,12 @@
     party: Democrat
     district: 22
     office: 1037 Longworth House Office Building
-    address: 1037 Longworth HOB; Washington DC 20515-6601
+    address: 1037 Longworth HOB; Washington DC 20515-0922
     phone: 202-225-9890
     url: http://frankel.house.gov
     rss_url: http://frankel.house.gov/rss.xml
     contact_form: http://frankel.house.gov/contact/email-me
+    fax: 561-998-9048
 - id:
     govtrack: 412530
     bioguide: G000573
@@ -35576,7 +35415,7 @@
     party: Democrat
     district: 26
     office: 1440 Longworth House Office Building
-    address: 1440 Longworth HOB; Washington DC 20515-6601
+    address: 1440 Longworth HOB; Washington DC 20515-0926
     phone: 202-225-2778
     url: http://garcia.house.gov
     rss_url: http://garcia.house.gov/rss.xml
@@ -35610,11 +35449,12 @@
     party: Republican
     district: 9
     office: 513 Cannon House Office Building
-    address: 513 Cannon HOB; Washington DC 20515-6601
+    address: 513 Cannon HOB; Washington DC 20515-1009
     phone: 202-225-9893
     url: http://dougcollins.house.gov
     rss_url: http://dougcollins.house.gov/latest-rss/latest-rss/
     contact_form: http://dougcollins.house.gov/email-me/
+    fax: 202-226-1224
 - id:
     govtrack: 412532
     bioguide: G000571
@@ -35649,6 +35489,7 @@
     url: http://gabbard.house.gov
     rss_url: http://gabbard.house.gov/rss.xml
     contact_form: http://gabbard.house.gov/contact/email-me
+    fax: 202-225-4987
 - id:
     govtrack: 412533
     bioguide: D000622
@@ -35713,7 +35554,7 @@
     party: Democrat
     district: 10
     office: 317 Cannon House Office Building
-    address: 317 Cannon HOB; Washington DC 20515-3602
+    address: 317 Cannon HOB; Washington DC 20515-1310
     phone: 202-225-4835
     url: http://schneider.house.gov
     rss_url: http://schneider.house.gov/rss.xml
@@ -35821,6 +35662,7 @@
     url: http://bustos.house.gov
     rss_url: http://bustos.house.gov/rss.xml
     contact_form: http://bustos.house.gov/contact
+    fax: 309-786-3720
 - id:
     govtrack: 412538
     bioguide: W000813
@@ -35850,11 +35692,12 @@
     party: Republican
     district: 2
     office: 419 Cannon House Office Building
-    address: 419 Cannon HOB; Washington DC 20515-0908
+    address: 419 Cannon HOB; Washington DC 20515-1402
     phone: 202-225-3915
     url: http://walorski.house.gov
     rss_url: http://walorski.house.gov/rss.xml
     contact_form: http://walorski.house.gov/contact/email-me
+    fax: 202-225-6798
 - id:
     govtrack: 412539
     bioguide: B001284
@@ -35920,11 +35763,12 @@
     party: Republican
     district: 6
     office: 508 Cannon House Office Building
-    address: 508 Cannon HOB; Washington DC 20515-2210
+    address: 508 Cannon HOB; Washington DC 20515-1406
     phone: 202-225-3021
     url: http://messer.house.gov
     rss_url: http://messer.house.gov/rss.xml
     contact_form: http://messer.house.gov/contact/email-me
+    fax: 765-747-5586
 - id:
     govtrack: 412541
     bioguide: B001282
@@ -36027,11 +35871,23 @@
     party: Democrat
     district: 4
     office: 1218 Longworth House Office Building
-    address: 1218 Longworth HOB; Washington DC 20515-2901
+    address: 1218 Longworth HOB; Washington DC 20515-2104
     phone: 202-225-5931
     url: http://kennedy.house.gov
     rss_url: http://kennedy.house.gov/rss.xml
     contact_form: http://kennedy.house.gov/contact/email-me
+    fax: 202-225-0182
+  family:
+  - name: Joseph Patrick Kennedy II
+    relation: son
+  - name: Edward Moore Kennedy
+    relation: great nephew
+  - name: John Fitzgerald Kennedy
+    relation: great nephew
+  - name: John Francis Fitzgerald
+    relation: great great grandson
+  - name: Patrick Joseph Kennedy
+    relation: first cousin once removed
 - id:
     govtrack: 412544
     bioguide: D000620
@@ -36103,6 +35959,7 @@
     state_rank: junior
     contact_form: http://www.king.senate.gov/contact
     rss_url: http://www.king.senate.gov/rss/feeds/?type=all
+    fax: 202-224-1946
 - id:
     govtrack: 412546
     bioguide: K000380
@@ -36133,11 +35990,14 @@
     party: Democrat
     district: 5
     office: 327 Cannon House Office Building
-    address: 327 Cannon HOB; Washington DC 20515-4320
+    address: 327 Cannon HOB; Washington DC 20515-2205
     phone: 202-225-3611
     url: http://danielkildee.house.gov
     rss_url: http://dankildee.house.gov/rss.xml
     contact_form: http://danielkildee.house.gov/contact/email-me
+  family:
+  - name: Dale Edward Kildee
+    relation: nephew
 - id:
     govtrack: 412547
     bioguide: B001280
@@ -36256,7 +36116,7 @@
     party: Republican
     district: 2
     office: 435 Cannon House Office Building
-    address: 435 Cannon HOB; Washington DC 20515-4312
+    address: 435 Cannon HOB; Washington DC 20515-2502
     phone: 202-225-1621
     url: http://wagner.house.gov
     rss_url: http://wagner.house.gov/rss.xml
@@ -36330,6 +36190,7 @@
     url: http://hudson.house.gov
     rss_url: http://hudson.house.gov/rss.xml
     contact_form: http://hudson.house.gov/email-me/
+    fax: 704-782-1004
 - id:
     govtrack: 412551
     bioguide: P000606
@@ -36359,11 +36220,12 @@
     party: Republican
     district: 9
     office: 224 Cannon House Office Building
-    address: 224 Cannon HOB; Washington DC 20515-3815
+    address: 224 Cannon HOB; Washington DC 20515-3309
     phone: 202-225-1976
     url: http://pittenger.house.gov
     rss_url: http://pittenger.house.gov/rss.xml
     contact_form: http://pittenger.house.gov/contact/email-me
+    fax: 202-225-3389
 - id:
     govtrack: 412552
     bioguide: M001187
@@ -36393,7 +36255,7 @@
     party: Republican
     district: 11
     office: 1516 Longworth House Office Building
-    address: 1516 Longworth HOB; Washington DC 20515-0905
+    address: 1516 Longworth HOB; Washington DC 20515-3311
     phone: 202-225-6401
     url: http://meadows.house.gov
     rss_url: http://meadows.house.gov/rss/press-releases.xml
@@ -36432,6 +36294,7 @@
     url: http://holding.house.gov
     rss_url: http://holding.house.gov/rss.xml
     contact_form: http://holding.house.gov/contact/email-me
+    fax: 919-782-4490
 - id:
     bioguide: H001069
     thomas: '02174'
@@ -36468,6 +36331,7 @@
     state_rank: junior
     contact_form: http://www.heitkamp.senate.gov/contact.cfm
     rss_url: http://www.heitkamp.senate.gov/public/index.cfm/rss/feed
+    fax: 202-224-7776
 - id:
     govtrack: 412555
     bioguide: C001096
@@ -36503,6 +36367,7 @@
     url: http://cramer.house.gov
     rss_url: http://cramer.house.gov/rss.xml
     contact_form: http://cramer.house.gov/contact/email-me
+    fax: 202-226-0893
 - id:
     bioguide: F000463
     thomas: '02179'
@@ -36539,6 +36404,7 @@
     state_rank: junior
     contact_form: http://www.fischer.senate.gov/public/index.cfm/contact
     rss_url: http://www.fischer.senate.gov/public/index.cfm/rss/feed
+    fax: 202-228-1325
 - id:
     govtrack: 412557
     bioguide: K000382
@@ -36574,6 +36440,7 @@
     url: http://kuster.house.gov
     rss_url: http://kuster.house.gov/rss.xml
     contact_form: http://kuster.house.gov/contact/email-me
+    fax: 202-225-2946
 - id:
     govtrack: 412558
     bioguide: L000580
@@ -36608,6 +36475,7 @@
     url: http://lujangrisham.house.gov
     rss_url: http://lujangrisham.house.gov/rss.xml
     contact_form: http://lujangrisham.house.gov/contact/email-me
+    fax: 202-225-4975
 - id:
     govtrack: 412559
     bioguide: H001066
@@ -36672,7 +36540,7 @@
     party: Democrat
     district: 6
     office: 1317 Longworth House Office Building
-    address: 1317 Longworth HOB; Washington DC 20515-2110
+    address: 1317 Longworth HOB; Washington DC 20515-3206
     phone: 202-225-2601
     url: http://meng.house.gov
     rss_url: http://meng.house.gov/rss.xml
@@ -36707,7 +36575,7 @@
     party: Democrat
     district: 8
     office: 1339 Longworth House Office Building
-    address: 1339 Longworth HOB; Washington DC 20515-1202
+    address: 1339 Longworth HOB; Washington DC 20515-3208
     phone: 202-225-5936
     url: http://jeffries.house.gov
     rss_url: http://jeffries.house.gov/rss.xml
@@ -36811,7 +36679,7 @@
     party: Republican
     district: 2
     office: 1223 Longworth House Office Building
-    address: 1223 Longworth HOB; Washington DC 20515-3810
+    address: 1223 Longworth HOB; Washington DC 20515-3502
     phone: 202-225-3164
     url: http://wenstrup.house.gov
     contact_form: http://wenstrup.house.gov/contact/
@@ -36879,11 +36747,12 @@
     party: Republican
     district: 14
     office: 1535 Longworth House Office Building
-    address: 1535 Longworth HOB; Washington DC 20515-1410
+    address: 1535 Longworth HOB; Washington DC 20515-3514
     phone: 202-225-5731
     url: http://joyce.house.gov
     rss_url: http://joyce.house.gov/rss/press-releases.xml
     contact_form: http://joyce.house.gov/email-me/
+    fax: 202-225-3307
 - id:
     govtrack: 412567
     bioguide: B001283
@@ -36918,6 +36787,7 @@
     url: http://bridenstine.house.gov
     rss_url: http://bridenstine.house.gov/rss.xml
     contact_form: http://bridenstine.house.gov/contact/email-me
+    fax: 918-935-2716
 - id:
     govtrack: 412568
     bioguide: M001190
@@ -36947,11 +36817,12 @@
     party: Republican
     district: 2
     office: 1113 Longworth House Office Building
-    address: 1113 Longworth HOB; Washington DC 20515-0401
+    address: 1113 Longworth HOB; Washington DC 20515-3602
     phone: 202-225-2701
     url: http://mullin.house.gov
     rss_url: http://mullin.house.gov/rss.xml
     contact_form: http://mullin.house.gov/contact/email-me
+    fax: 202-225-3038
 - id:
     govtrack: 412569
     bioguide: P000605
@@ -36981,11 +36852,12 @@
     party: Republican
     district: 4
     office: 126 Cannon House Office Building
-    address: 126 Cannon HOB; Washington DC 20515-5401
+    address: 126 Cannon HOB; Washington DC 20515-3804
     phone: 202-225-5836
     url: http://perry.house.gov
     rss_url: http://perry.house.gov/rss.xml
     contact_form: http://perry.house.gov/contact/email-me
+    fax: 202-226-1000
 - id:
     govtrack: 412570
     bioguide: R000598
@@ -37016,7 +36888,7 @@
     party: Republican
     district: 12
     office: 503 Cannon House Office Building
-    address: 503 Cannon HOB; Washington DC 20515-0518
+    address: 503 Cannon HOB; Washington DC 20515-3812
     phone: 202-225-2065
     url: http://rothfus.house.gov
     rss_url: http://rothfus.house.gov/rss.xml
@@ -37056,6 +36928,7 @@
     url: http://cartwright.house.gov
     rss_url: http://cartwright.house.gov/rss.xml
     contact_form: http://cartwright.house.gov/contact/email-me
+    fax: 570-341-1055
 - id:
     govtrack: 412572
     bioguide: R000597
@@ -37085,7 +36958,7 @@
     party: Republican
     district: 7
     office: 325 Cannon House Office Building
-    address: 325 Cannon HOB; Washington DC 20515-4209
+    address: 325 Cannon HOB; Washington DC 20515-4007
     phone: 202-225-9895
     url: http://rice.house.gov
     rss_url: http://rice.house.gov/rss.xml
@@ -37125,6 +36998,7 @@
     phone: 202-224-5922
     state_rank: junior
     contact_form: http://www.cruz.senate.gov/contact.cfm
+    fax: 202-228-3398
 - id:
     govtrack: 412574
     bioguide: W000814
@@ -37155,11 +37029,12 @@
     party: Republican
     district: 14
     office: 510 Cannon House Office Building
-    address: 510 Cannon HOB; Washington DC 20515-1402
+    address: 510 Cannon HOB; Washington DC 20515-4314
     phone: 202-225-2831
     url: http://weber.house.gov
     rss_url: http://weber.house.gov/rss.xml
     contact_form: http://weber.house.gov/contact/email-me
+    fax: 202-225-0271
 - id:
     govtrack: 412575
     bioguide: O000170
@@ -37228,6 +37103,7 @@
     url: http://castro.house.gov
     rss_url: http://castro.house.gov/rss.xml
     contact_form: http://castro.house.gov/contact/email-me
+    fax: 202-225-1915
 - id:
     govtrack: 412577
     bioguide: G000572
@@ -37263,6 +37139,7 @@
     url: http://gallego.house.gov
     rss_url: http://gallego.house.gov/rss.xml
     contact_form: http://gallego.house.gov/contact/email-me
+    fax: 210-927-4903
 - id:
     govtrack: 412578
     bioguide: W000816
@@ -37293,11 +37170,12 @@
     party: Republican
     district: 25
     office: 1122 Longworth House Office Building
-    address: 1122 Longworth HOB; Washington DC 20515-3209
+    address: 1122 Longworth HOB; Washington DC 20515-4325
     phone: 202-225-9896
     url: http://williams.house.gov
     rss_url: http://williams.house.gov/rss.xml
     contact_form: http://williams.house.gov/contact/email-me
+    fax: 512-473-8946
 - id:
     govtrack: 412579
     bioguide: V000131
@@ -37328,7 +37206,7 @@
     party: Democrat
     district: 33
     office: 414 Cannon House Office Building
-    address: 414 Cannon HOB; Washington DC 20515-1801
+    address: 414 Cannon HOB; Washington DC 20515-4333
     phone: 202-225-9897
     url: http://veasey.house.gov
     rss_url: http://veasey.house.gov/rss.xml
@@ -37362,11 +37240,12 @@
     party: Democrat
     district: 34
     office: 437 Cannon House Office Building
-    address: 437 Cannon HOB; Washington DC 20515-1902
+    address: 437 Cannon HOB; Washington DC 20515-4334
     phone: 202-225-9901
     url: http://vela.house.gov
     rss_url: http://vela.house.gov/rss.xml
     contact_form: http://vela.house.gov/contact/email-me
+    fax: 202-225-9770
 - id:
     govtrack: 412581
     bioguide: S001192
@@ -37396,11 +37275,12 @@
     party: Republican
     district: 2
     office: 323 Cannon House Office Building
-    address: 323 Cannon HOB; Washington DC 20515-0924
+    address: 323 Cannon HOB; Washington DC 20515-4402
     phone: 202-225-9730
     url: http://stewart.house.gov
     rss_url: http://stewart.house.gov/rss.xml
     contact_form: http://stewart.house.gov/contact/email-me
+    fax: 801-364-5551
 - id:
     bioguide: K000384
     thomas: '02176'
@@ -37437,6 +37317,7 @@
     state_rank: junior
     contact_form: http://www.kaine.senate.gov/contact
     rss_url: http://www.kaine.senate.gov/rss/feeds/?type=all
+    fax: 202-228-6363
 - id:
     govtrack: 412583
     bioguide: K000381
@@ -37505,6 +37386,7 @@
     url: http://dennyheck.house.gov
     rss_url: http://dennyheck.house.gov/rss.xml
     contact_form: http://dennyheck.house.gov/contact/email-me
+    fax: 202-225-0129
 - id:
     govtrack: 412585
     bioguide: P000607
@@ -37534,11 +37416,12 @@
     party: Democrat
     district: 2
     office: 313 Cannon House Office Building
-    address: 313 Cannon HOB; Washington DC 20515-0925
+    address: 313 Cannon HOB; Washington DC 20515-4902
     phone: 202-225-2906
     url: http://pocan.house.gov
     rss_url: http://pocan.house.gov/rss.xml
     contact_form: http://pocan.house.gov/contact/email-me
+    fax: 202-225-6942
 - id:
     bioguide: K000385
     thomas: '02190'
@@ -37547,7 +37430,7 @@
     wikipedia: Robin Kelly
     fec:
     - H2IL02172
-    opensecrets: N00033549
+    opensecrets: N00035215
     ballotpedia: Robin Kelly
     cspan: 70399
     washington_post: 0e9272ea-b743-11e2-b94c-b684dda07add
@@ -37572,11 +37455,12 @@
     url: http://robinkelly.house.gov
     contact_form: http://robinkelly.house.gov/contact/email-me
     rss_url: http://robinkelly.house.gov/rss.xml
+    fax: 202-225-4583
 - id:
     bioguide: S000051
     thomas: '01012'
     govtrack: 400607
-    opensecrets: N00033549
+    opensecrets: N00002424
     wikipedia: Mark Sanford
     votesmart: 21991
     ballotpedia: Mark Sanford
@@ -37624,14 +37508,15 @@
     url: http://sanford.house.gov/
     contact_form: https://sanford.house.gov/contact/email-me
     rss_url: http://sanford.house.gov/rss.xml
+    fax: 843-521-2535
 - id:
     bioguide: S001195
     thomas: '02191'
     govtrack: 412596
-    opensecrets: N00033549
     wikipedia: Jason T. Smith
     votesmart: 59318
     maplight: 35979
+    opensecrets: N00035282
     fec:
     - H4MO08162
   name:
@@ -37655,34 +37540,27 @@
     contact_form: https://jasonsmith.house.gov/contact/email-me
     address: 2230 Rayburn HOB; Washington DC 20515-2508
     rss_url: http://jasonsmith.house.gov/rss.xml
+    fax: 202-226-0326
 - id:
-    bioguide: C001100
-    govtrack: 412597
-    lis: S368
-    votesmart: 144672
-    wikipedia: Jeffrey Chiesa
-    thomas: '02192'
-    ballotpedia: Jeff Chiesa
-    cspan: 64996
-    maplight: 36111
+    bioguide: B001288
+    lis: S370
+    thomas: '02194'
+    govtrack: 412598
+    votesmart: 76151
+    wikipedia: Cory Booker
   name:
-    first: Jeffrey
-    middle: Scott
-    last: Chiesa
-    official_full: Jeff Chiesa
+    first: Cory
+    middle: Anthony
+    last: Booker
+    official_full: Cory Booker
   bio:
-    birthday: '1965-06-22'
+    birthday: '1969-04-27'
     gender: M
   terms:
   - type: sen
-    start: '2013-06-10'
-    end: '2013-12-31'
+    start: '2013-10-31'
+    end: '2015-01-03'
     state: NJ
     class: 2
-    party: Republican
+    party: Democrat
     state_rank: junior
-    url: http://www.chiesa.senate.gov
-    phone: 202-224-3224
-    office: 1 Russell Courtyard
-    address: 1 RUSSELL COURTYARD WASHINGTON DC 20510
-    contact_form: http://www.chiesa.senate.gov/contact.cfm

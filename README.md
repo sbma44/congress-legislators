@@ -7,7 +7,7 @@ This repository contains data about legislators:
 
 * legislators-current.yaml: Currently serving Members of Congress (as of last update).
 * legislators-historical.yaml: Historical Members of Congress (i.e. all Members of Congress except those in the current file).
-* legislators-social-media.yaml: Current social media accounts for Members of Congress.
+* legislators-social-media.yaml: Current social media accounts for Members of Congress. Official accounts only (no campaign or personal accounts).
 
 And about committees:
 
@@ -181,7 +181,7 @@ Social Media Data Dictionary
 
 The social media file legislators-social-media.yaml stores current social media account information.
 
-Each record has two sections: id and social. The id section identifies the legislator using biogiude, thomas, and govtrack IDs (where available). The social section has social media account identifiers:
+Each record has two sections: `id` and `social`. The `id` section identifies the legislator using bioguide, thomas, and govtrack IDs (where available). The `social` section has social media account identifiers:
 
 * twitter: The current official Twitter handle of the legislator.
 * youtube: The current official YouTube username of the legislator.
@@ -275,6 +275,7 @@ Each committee/subcommittee entry is a list containing the members of the commit
 * party: Either "majority" or "minority." Committee work is divided strictly by party.
 * rank: The apparent rank of the member on the committee, within his or her party. This is based on the order of names on the House/Senate committee membership pages. Rank 1 is always for the committee chair or ranking member (the most senior minority party member). The rank is essentially approximate, because the House/Senate pages don't necessarily make a committment that the order on the page precisely indicates actual rank (if such a concept even applies). But if you want to preserve the order as displayed by the House and Senate, you can use this attribute.
 * title: The title of the member on the committee, e.g. Chair, Ranking Member, or Ex Officio. This field is not normalized, however, so be prepared to accept any string.
+* chamber: For joint committees only, the chamber that the representative is serving in, either `house` or `senate`.
 
 The Executive Branch
 --------------------
@@ -413,6 +414,14 @@ The following script takes one required command line argument
 --congress=congress_number
 where congress_number is the number of the congress to be updated. As of July, 2013, the permanent URL for future roll call data is unclear, and as such, the script may need to be modified when it is run for the 114th congress.
 
+The following script may be run to create alternatly formatted data files. It takes no command-line arguments.
+* alternate_bulk_formats.py creates four files (two each for current and historical legislators) in json and csv formats. The csv files do not include all fields from the legislator yaml files, and include data from the social media yaml. All four files are stored in the ~/alternate_formats directory.
+
+Other Scripts
+----------------------
+
+The `ballotpedia`, `maplight`, and `washington_post` fields have been created using code from James Michael DuPont, using the code in [git@github.com:h4ck3rm1k3/rootstrikers-wikipedia.git](https://github.com/h4ck3rm1k3/rootstrikers-wikipedia) in the branch `ballotpedia`.
+
 Who's Using This Data
 ---------------------
 
@@ -423,6 +432,10 @@ Here are the ones we know about:
 * [The New York Times Congress API](http://developer.nytimes.com/docs/read/congress_api)
 * [OpenCongress.org](http://www.opencongress.org)
 
-Other Scripts
-----------------------
-The `ballotpedia`, `maplight`, and `washington_post` fields have been created using code from James Michael DuPont, using the code in [git@github.com:h4ck3rm1k3/rootstrikers-wikipedia.git](https://github.com/h4ck3rm1k3/rootstrikers-wikipedia) in the branch `ballotpedia`.
+### Related libraries
+
+* Karl Nicholas made a set of [Java classes](https://github.com/knicholas/congress-legislators) to easily filter the data.
+
+### License
+
+All data and code in this project is [licensed under CC0](LICENSE) ([summary](http://creativecommons.org/publicdomain/zero/1.0/)).
