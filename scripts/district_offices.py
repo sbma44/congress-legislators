@@ -32,15 +32,23 @@ import datetime
 import hashlib
 import pprint
 import time
-import cPickle as pickle
-from pygeocoder import Geocoder
+try:
+  import cPickle as pickle
+except:
+  import pickle
 from utils import download, load_data, save_data, parse_date
 import lxml.html, lxml.etree, StringIO
 import requests
 import urlparse
 import curses
 import math
+import SimpleHTTPServer
+import SocketServer
+
 import microtron
+import geopy.geocoders
+import dataset
+
 from settings import *
 
 debug = False
@@ -52,6 +60,52 @@ re_zipcode = re.compile(r'[^\d](\d{5}(\-\d{4})?)', (re.MULTILINE|re.DOTALL))
 re_office = re.compile(r'office', re.IGNORECASE)
 
 LOCKFILE = '.districtofficesavelock'
+
+class CustomHTTPRequestHandler(SimpleHTTPServer.SimpleHTTPRequestHandler, object):
+  """serves resources and handles actions for the """
+  def __init__(self, *args, **kwargs):
+    print 'spawning new instance of handler'
+    super(CustomHTTPRequestHandler, self).__init__(*args, **kwargs)
+    
+  def do_GET(self, *args, **kwargs):
+    # args = self.parse_args()
+    if True: # do something custom
+      
+      self.send_response(200)
+      self.send_header('Content-type', 'text/html')
+      self.end_headers()
+
+      self.wfile.write('A'*80 + self.path)
+      
+    
+    else:
+      super(CustomHTTPRequestHandler, self).do_GET()
+    
+
+def save_offices(office_dataset, unreviewed=False, flagged=False, approved=False, gpo=False):
+  db = dataset.connect('sqlite:///legislators-district-offices.db')
+  table = db['legislators_district_offices']
+  for bioguide in office_dataset:
+    for i in range(0, len(office_dataset[bioguide])):
+      office_dataset[bioguide][i].update({ 'bioguide': bioguide, 'unreviewed': unreviewed, 'flagged': flagged, 'approved': approved, 'gpo': gpo})
+      table.upsert(office_dataset[bioguide][i], ['bioguide', '_source_hash'])
+
+def load_offices(**filter):
+  db = dataset.connect('sqlite:///legislators-district-offices.db')
+  table = db['legislators_district_offices']
+  working_set = table.find(**filter)
+  return_set = {}
+  for row in working_set:
+    if not return_set.has_key(row['bioguide']):
+      return_set[row['bioguide']] = []
+    return_set[row['bioguide']].append(row)
+  return return_set
+
+def get_geocoder():
+  # geopy makes swapping geocoders easy. be sure to choose one based
+  # on your licensing requirements!
+  return geopy.geocoders.GoogleV3()
+  # return geopy.geocoders.GeocoderDotUS()
 
 def strip_tags(html):
   return re.sub(r'<\/?[^>]*>', r'', html).strip()
@@ -133,11 +187,16 @@ def detect_possible_office_elements(member, url, body):
   return possible_office_matches
 
 
-def extract_info_from_html_element(state, element, meta):
+
+def extract_info_from_html_element(state, element, meta, html=None):
 
   extracted_info = {}      
            
-  match_html = lxml.etree.tostring(element)
+  match_html = ''
+  if html is None:
+    match_html = lxml.etree.tostring(element)
+  else:
+    match_html = html
 
   # remove other junk
   match_html = re.sub('(&nbsp;|&#160;)',' ', re.sub(r'&#13;','',match_html)).strip()
@@ -327,7 +386,7 @@ def rewrite_link_to_absolute_url(root_url, link):
   return urlparse.urljoin(root_url, link)  
 
 
-def scrape():
+def scrape_member_sites():
   """ Scrapes congressional websites, trying multiple URLs when
   necessary and making informed guesses about where district office info
   can be found. """
@@ -359,7 +418,7 @@ def scrape():
     if not url:
       if debug:
         print "[%s] No official website, skipping" % bioguide
-      return None
+      continue
 
     # grab the front page of the website
     if debug:
@@ -412,7 +471,9 @@ def scrape():
   # save our work
   if debug_bioguide is None:
     print "Saving data..."
+    save_offices(output, unreviewed=True, flagged=False, approved=False, gpo=False)
     save_data(output, "legislators-district-offices-unreviewed.yaml")
+    save_offices(flagged, unreviewed=False, flagged=True, approved=False, gpo=False)
     save_data(flagged, 'legislators-district-offices-flagged.yaml')
   else:
     pprint.pprint(output)
@@ -436,7 +497,7 @@ def verify(offices):
     for office in offices[bioguide]:    
 
       # skip obviously incomplete records        
-      if not(office.has_key('address_0') and office.has_key('city') and office.has_key('state') and office.has_key('zipcode')):
+      if (office.get('address_0', None) is None) or (office.get('city', None) is None) or (office.get('state', None) is None) or (office.get('zipcode', None) is None):
         continue
 
       # skip DC offices
@@ -453,7 +514,7 @@ def verify(offices):
         f.close()
 
       if geocoded_result:        
-        coords = (geocoded_result[0]['geometry']['location']['lat'], geocoded_result[0]['geometry']['location']['lng'])
+        coords = geocoded_result[1]
         url = 'http://congress.api.sunlightfoundation.com/legislators/locate?latitude=%f&longitude=%f&apikey=%s' % (coords[0], coords[1], SUNLIGHT_API_KEY)        
         response = requests.get(url)
         result = json.loads(response.text)
@@ -462,9 +523,9 @@ def verify(offices):
         returned_bioguide_ids = []
         for b in result.get('results',{}):
           returned_bioguide_ids.append(b['bioguide_id'])
-        if bioguide in returned_bioguide_ids:
+        if bioguide in returned_bioguide_ids:          
           print "[%s] Confirmed in-district office: '%s'" % (bioguide, office_address_string(office))
-          office.update({'latitude': geocoded_result[0]['geometry']['location']['lat'], 'longitude': geocoded_result[0]['geometry']['location']['lng'], 'confirmed_in_district': True})
+          office.update({'latitude': coords[0], 'longitude': coords[1], 'confirmed_in_district': True})
         else:
           print "[%s] District mismatch: '%s'" % (bioguide, office_address_string(office))
       else:
@@ -472,6 +533,7 @@ def verify(offices):
 
   print "Saving data..."
   save_data(offices, "legislators-district-offices-unreviewed.yaml")
+  save_offices(offices, unreviewed=True, flagged=False, approved=False, gpo=False)
 
   return offices
 
@@ -507,8 +569,11 @@ def review_save(unreviewed, approved, flagged):
     flagged_s = review_prep_data_pre_save(flagged)
 
     save_data(unreviewed_s, 'legislators-district-offices-unreviewed.yaml')
+    save_offices(unreviewed_s, unreviewed=True, flagged=False, approved=False, gpo=False)
     save_data(approved_s, 'legislators-district-offices-approved.yaml')
+    save_offices(approved_s, unreviewed=False, flagged=False, approved=True, gpo=False)
     save_data(flagged_s, 'legislators-district-offices-flagged.yaml')
+    save_offices(flagged_s, unreviewed=False, flagged=True, approved=False, gpo=False)
 
     # remove lock
     os.unlink(LOCKFILE)
@@ -527,23 +592,36 @@ def review_draw_office(window, office):
     window.addstr(len(FIELDS)+3, 2, "CONFIRMED IN DISTRICT", curses.color_pair(1))
   window.refresh()
 
+
+def review_http():
+  PORT = 8000
+  Handler = CustomHTTPRequestHandler
+  httpd = SocketServer.TCPServer(("", PORT), Handler)
+  print "serving at port", PORT
+  httpd.serve_forever()
+
+
+
 def review():  
 
   legislators = {}
   for l in utils.load_data('legislators-current.yaml'):
-    legislators[l['id']['bioguide']] = "%s %s" % (l['name']['first'], l['name']['last'])
+    legislators[l['id']['bioguide']] = "%s %s (%s)" % (l['name']['first'], l['name']['last'], l["terms"][-1]['state'])
 
   unreviewed = approved = flagged = {}
   try:
-    unreviewed = load_data('legislators-district-offices-unreviewed.yaml')
+    unreviewed = load_offices(unreviewed=True)
+    # unreviewed = load_data('legislators-district-offices-unreviewed.yaml')
   except Exception, e:
     pass
   try:
-    approved = load_data('legislators-district-offices-approved.yaml')
+    approved = load_offices(approved=True)
+    # approved = load_data('legislators-district-offices-approved.yaml')
   except Exception, e:
     pass
   try:
-    flagged = load_data('legislators-district-offices-flagged.yaml')
+    flagged = load_offices(flagged=True)
+    # flagged = load_data('legislators-district-offices-flagged.yaml')
   except Exception, e:
     pass
   
@@ -578,8 +656,12 @@ def review():
       window.erase()
 
       # draw menu line across bottom
+      window.addstr(max_y-3, 0, " " * max_x, curses.A_REVERSE)
+      window.addstr(max_y-4, 0, " " * max_x, curses.A_REVERSE)      
+      window.addstr(max_y-5, 0, " " * max_x, curses.A_REVERSE)
+      window.addstr(max_y-3, 0, "[A]pprove     [F]lag     [S]ave     s[K]ip     [Q]uit", curses.A_REVERSE)
       window.addstr(max_y-4, 0, "s[P]lit address     [M]ove address_0 into label      ", curses.A_REVERSE)
-      window.addstr(max_y-5, 0, "[A]pprove     [F]lag     [S]ave     s[K]ip     [Q]uit", curses.A_REVERSE)
+      window.addstr(max_y-5, 0, "[R]eprocess longest field", curses.A_REVERSE)      
        
       if len(unreviewed)>0:
         
@@ -644,6 +726,33 @@ def review():
             del office['address_%d' % i]
           review_draw_office(window, office)
 
+        if c=='R':
+          longest_field = (None, 0)          
+          meta = {}
+          for (k,v) in office.items():
+            if not k.startswith('_'):
+              if len(v)>longest_field[1]:
+                longest_field = (k, len(v))
+            else:
+              meta[k] = v
+
+          longest_field_contents = office.get(longest_field[0])
+
+          # bunch of commas? if so, split it into lines
+          if len(longest_field_contents.split(','))>3:
+            longest_field_contents = "\n".join(longest_field_contents.split(','))
+          if len(longest_field_contents.split('|'))>3:
+            longest_field_contents = "\n".join(longest_field_contents.split('|'))
+
+
+          state = office.get('state')
+          if state is None:
+            state = re.sub(r'[\(\)]','',legislators[bioguide].split(' ')[-1])
+          extracted_elements = extract_info_from_html_element(state, None, meta, html=longest_field_contents)
+          office.update(extracted_elements)
+          review_draw_office(window, office)
+
+
         # file away entry -- skip, accept, flag
         if c in ('F', 'A', 'K'):
           unreviewed.pop(0)
@@ -665,7 +774,7 @@ def review():
 def office_address_string(office):
   address = []
   i = 0
-  while office.has_key('address_%d' % i):
+  while office.get('address_%d' % i, None) is not None:
     address.append(office.get('address_%d' % i))
     i = i + 1
   address.append('%s, %s' % (office.get('city', ''), office.get('state', '')))
@@ -706,18 +815,86 @@ def geocode(offices):
       # geocode
       print '[%s] Geocoding \'%s\'' % (bioguide, address_string)      
       try:
-        geocoder_results = Geocoder.geocode(address_string)
+        geolocator = get_geocoder()
+        result = geolocator.geocode(address_string)
       except Exception, e:
         # problem? continue on, blissfully unaware of the problem
         continue
 
       # store the result(s)
       f = open(opath, 'w')
-      pickle.dump(geocoder_results.raw, f)
+      pickle.dump(result, f)
       f.close()
 
       # give google a little break
       time.sleep(0.5)
+
+def scrape_gpo():
+  """Collects district office information from the GPO member guide mobile site"""
+  member_offices = {}
+
+  legislator_lookup = {}  
+  for l in utils.load_data('legislators-current.yaml'):
+    legislator_state = l["terms"][-1]['state']
+    if not legislator_lookup.has_key(legislator_state):
+      legislator_lookup[legislator_state] = {}
+    legislator_lookup[legislator_state]['%s/%d/%s' % ( (l["terms"][-1]['type']=='sen' and 'Senator' or 'Representative').upper(), l["terms"][-1].get('district',0), l['name']['last'].upper())] = l['id']['bioguide']
+  
+  for state in utils.states.keys():
+    url = "http://m.gpo.gov/wsgpo/memberDirectory/state/%s" % state
+    members_in_this_state = json.loads(utils.download(url, destination=None, force=True))    
+    for member in members_in_this_state:
+      member_id = member.get('memberId', None)
+      if member_id is not None:        
+        
+        cache = "gpo/%d.json" % int(member_id)
+        member_data = json.loads(utils.download('http://m.gpo.gov/wsgpo/memberDirectory/id/%d' % int(member_id), destination=cache))
+        print "Collecting information for %s %s (%s)" % (member_data.get('memberType'), member_data.get('lastName',''), state)
+        
+        member_district = member_data.get('district','')
+        if len(member_district)==0:
+          member_district = 0
+        elif member_district.upper()=='AT LARGE':
+          member_district = 0
+        else:
+          member_district = int(member_district)
+        member_bioguide = legislator_lookup[state].get('%s/%d/%s' % (member_data.get('memberType').upper(), member_district, member_data.get('lastName','').upper()), None)
+        if member_bioguide is None:
+          continue
+
+        # iterate through offices (if there are any)
+        member_office_list = member_data.get('officeList', [])
+        if member_office_list is None:
+          member_office_list = []
+        for office in member_office_list:
+          field_mapping = {
+            'address_0': 'street',
+            'city': 'city',
+            'state': 'stateId',
+            'zipcode': 'zip',
+            'phone': 'phone',
+            'fax': 'fax'
+          }
+          if office.get('officeDescription', '')=='District':
+            new_office = {}
+            for (field_a, field_b) in field_mapping.items():
+              val = office.get(field_b, None)           
+              
+              if val is not None and len(val)>0:
+                new_office[field_a] = val    
+
+            # test for 7-digit fax, 10-digit phone & fix
+            if (len(re.sub(r'[^\d]','',new_office.get('fax','')))==7) and (len(re.sub(r'[^\d]','',new_office.get('phone','')))==10):
+              new_office['fax'] = "%s%s" % (re.sub(r'[^\d]','',new_office.get('phone',''))[:3], re.sub(r'[^\d]','', new_office['fax']))
+              new_office['fax'] = "%s-%s-%s" % (new_office['fax'][0:3], new_office['fax'][3:6], new_office['fax'][6:])            
+
+            if not member_offices.has_key(member_bioguide):
+              member_offices[member_bioguide] = []
+            member_offices[member_bioguide].append(new_office.copy())
+
+  # save our work
+  utils.save_data(member_offices, 'legislators-district-offices-gpo.yaml')
+  save_offices(member_offices, unreviewed=False, flagged=False, approved=False, gpo=True)
 
 def remove_dc(offices):
   output = {}
@@ -734,6 +911,7 @@ def remove_dc(offices):
   print "Removed %d D.C. offices." % removal_count
   print "Saving..."
   save_data(output, "legislators-district-offices-unreviewed.yaml")
+  save_offices(output, unreviewed=True, flagged=False, approved=False, gpo=False)
   return output
 
 if __name__ == '__main__':
@@ -747,31 +925,39 @@ if __name__ == '__main__':
 
   offices = None
 
+  if utils.flags().get('scrape-gpo', False):
+    print 'Scraping GPO'
+    offices = scrape_gpo()
+
   if utils.flags().get('scrape', False):
-    offices = scrape() # collect basic info
+    offices = scrape_member_sites() # collect basic info
 
   if utils.flags().get('remove-dc', False):
     if offices is None:
-      offices = utils.load_data("legislators-district-offices-unreviewed.yaml") # load data if necessary
+      offices = load_offices(unreviewed=True)
+      # offices = utils.load_data("legislators-district-offices-unreviewed.yaml") # load data if necessary
     offices = remove_dc(offices) # remove DC offices
 
   if utils.flags().get('geocode', False):
     if offices is None:
-      offices = utils.load_data("legislators-district-offices-unreviewed.yaml") # load data if necessary
+      offices = load_offices(unreviewed=True)
+      # offices = utils.load_data("legislators-district-offices-unreviewed.yaml") # load data if necessary
     geocode(offices) # geocode data
 
   if utils.flags().get('verify', False):
     if offices is None:
-      offices = utils.load_data("legislators-district-offices-unreviewed.yaml") # load data if necessary    
+      offices = load_offices(unreviewed=True)
+      # offices = utils.load_data("legislators-district-offices-unreviewed.yaml") # load data if necessary    
     offices = verify(offices) # test geocoded info against districts
 
   if utils.flags().get('review', False):
     if offices is None:
-      offices = utils.load_data('legislators-district-offices-unreviewed.yaml')
+      offices = load_offices(unreviewed=True)
+      # offices = utils.load_data('legislators-district-offices-unreviewed.yaml')
       if len(offices)==0:
         print 'No reviewable data found.'
       else:
-        review()
+        review_http()
 
 
 
